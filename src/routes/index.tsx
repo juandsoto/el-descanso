@@ -7,23 +7,25 @@ interface Route {
 }
 
 const routes: Route[] = [
-	{ path: '/', element: <Home /> },
-	{ path: '/login', element: <Login /> },
-	{ path: '/reservas', element: <Reservas /> },
-	{ path: '/reservas/:reserva_id', element: <Reserva /> },
-	{ path: '/habitaciones', element: <Habitaciones /> },
-	{ path: '/habitaciones/:habitacion_id', element: <Habitacion /> },
-	{ path: '/servicios', element: <Servicios /> },
-	{ path: '/servicios/:servicio_id', element: <Servicio /> },
-	{ path: '/estadisticas', element: <Estadisticas /> },
-	{ path: '/admin', element: <Admin /> },
+	{ path: '', element: <Home /> },
+	{ path: 'login', element: <Login /> },
+	{ path: 'reservas', element: <Reservas /> },
+	{ path: 'reservas/:reserva_id', element: <Reserva /> },
+	{ path: 'habitaciones', element: <Habitaciones /> },
+	{ path: 'habitaciones/:habitacion_id', element: <Habitacion /> },
+	{ path: 'servicios', element: <Servicios /> },
+	{ path: 'servicios/:servicio_id', element: <Servicio /> },
+	{ path: 'estadisticas', element: <Estadisticas /> },
+	{ path: 'admin', element: <Admin /> },
 ];
 
 const Navigator = () => {
 	return (
 		<BrowserRouter>
 			<Routes>
-				{ routes.map((props, index) => <Route key={ index } { ...props } ></Route>) }
+				<Route path='/el-descanso'>
+					{ routes.map((props, index) => <Route key={ index } { ...props } ></Route>) }
+				</Route>
 			</Routes>
 		</BrowserRouter>
 	);

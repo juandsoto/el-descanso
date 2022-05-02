@@ -1,10 +1,10 @@
 export { default as Home } from "./Home";
 export { default as Login } from "./Login";
-export { default as Reservas } from "./Reservas";
-export { default as Reserva } from "./Reserva";
-export { default as Habitaciones } from "./Habitaciones";
-export { default as Habitacion } from "./Habitacion";
-export { default as Servicios } from "./Servicios";
-export { default as Servicio } from "./Servicio";
-export { default as Estadisticas } from "./Estadisticas";
+export { default as ReservaDetail } from "./ReservaDetail";
+export { default as HabitacionDetail } from "./HabitacionDetail";
+export { default as ServicioDetail } from "./ServicioDetail";
+export { default as Estadisticas } from "../components/Estadisticas";
 export { default as Admin } from "./Admin";
+export { default as Recepcionista } from "./Recepcionista";
+export { default as Gerente } from "./Gerente";
+export { default as Cajero } from "./Cajero";

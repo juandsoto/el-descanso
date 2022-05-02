@@ -157,7 +157,7 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
                               }
                             >
                               {/*ts-ignore*/}
-                              {servicio[item] ? (
+                              {servicio[item as keyof IServicio] ? (
                                 <CheckIcon
                                   sx={{ color: "#0CB0A9", fontSize: "2rem" }}
                                 />
@@ -171,7 +171,7 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
                         ) : (
                           <TableCell align="center" key={index}>
                             {/*ts-ignore*/}
-                            {servicio[item] ? (
+                            {servicio[item as keyof IServicio] ? (
                               <CheckIcon
                                 sx={{ color: "#0CB0A9", fontSize: "2rem" }}
                               />

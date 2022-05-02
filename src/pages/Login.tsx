@@ -44,7 +44,7 @@ const Login = (): JSX.Element => {
   const { form, handleChange } = useForm<ILogin>({
     usuario: "",
     contraseña: "",
-  } as ILogin);
+  });
 
   const theme = useTheme();
 

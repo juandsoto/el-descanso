@@ -18,10 +18,6 @@ const useForm = <T>(initialState: T) => {
     });
   };
 
-  React.useEffect(() => {
-    setForm(initialState);
-  }, [initialState]);
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log({ formSubmit: form });

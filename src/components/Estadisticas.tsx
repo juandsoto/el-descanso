@@ -11,6 +11,7 @@ import React from "react";
 import EditDialog from "./EditDialog";
 import { ocupacionHotel, usoDeServicios } from "../data";
 import { Bar, Line } from "react-chartjs-2";
+import { useAuth } from "../context/auth/index";
 
 const Estadisticas = (): JSX.Element => {
   return (
@@ -73,17 +74,18 @@ const Cancelacion = (): JSX.Element => {
           width: "70px",
         }}
       >
-        <Box component="span">{cancelacion}%</Box>
+        <Box component="span">{cancelacion.toFixed(2)}%</Box>
       </Stack>
     </Stack>
   );
 };
 
-const Descuento = (): JSX.Element => {
+export const Descuento = (): JSX.Element => {
   const [value, setValue] = React.useState<number>(5);
   const [openDialog, setOpenDialog] = React.useState<boolean>(false);
 
   const theme = useTheme();
+  const { user } = useAuth();
 
   return (
     <Stack
@@ -110,35 +112,41 @@ const Descuento = (): JSX.Element => {
         sx={{
           fontSize: "1.5rem",
           bgcolor: theme.palette.primary.main,
-          borderRadius: "50px",
           height: "70px",
           width: "70px",
+          borderRadius: "50px",
         }}
       >
-        <MuiTooltip title="click para editar">
-          <Box
-            component="span"
-            sx={{ cursor: "pointer" }}
-            onClick={() => setOpenDialog(true)}
-          >
-            {value}%
-          </Box>
-        </MuiTooltip>
-        <EditDialog
-          open={openDialog}
-          handleClose={() => setOpenDialog(false)}
-          inputType="number"
-          dialogInfo={{
-            title: "Editar Descuento",
-            name: "descuento",
-            description: `Cambiar descuento para los clientes habituales`,
-            onCancel: () => setOpenDialog(false),
-            onConfirm: (value: number) => {
-              setValue(value);
-              setOpenDialog(false);
-            },
-          }}
-        />
+        {user.rol === "administrador" ? (
+          <>
+            <MuiTooltip title="click para editar">
+              <Box
+                component="span"
+                sx={{ cursor: "pointer" }}
+                onClick={() => setOpenDialog(true)}
+              >
+                {value.toFixed(2)}%
+              </Box>
+            </MuiTooltip>
+            <EditDialog
+              open={openDialog}
+              handleClose={() => setOpenDialog(false)}
+              inputType="number"
+              dialogInfo={{
+                title: "Editar Descuento",
+                name: "descuento",
+                description: `Cambiar descuento para los clientes habituales`,
+                onCancel: () => setOpenDialog(false),
+                onConfirm: (value: number) => {
+                  setValue(value);
+                  setOpenDialog(false);
+                },
+              }}
+            />
+          </>
+        ) : (
+          <Box component="span">{value.toFixed(2)}%</Box>
+        )}
       </Stack>
     </Stack>
   );

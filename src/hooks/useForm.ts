@@ -23,11 +23,14 @@ const useForm = <T>(initialState: T) => {
     console.log({ formSubmit: form });
   };
 
+  const reset = () => setForm(initialState);
+
   return {
     form,
     handleChange,
     handleSubmit,
     handleSelectChange,
+    reset,
   };
 };
 

@@ -16,6 +16,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import useForm from "../hooks/useForm";
 import { IUsuario } from "../interfaces/Usuario";
+import ICliente from "../interfaces/Cliente";
 
 interface FormProps<T> {
   editing: T;
@@ -24,7 +25,9 @@ interface FormProps<T> {
   type: "usuario" | "cliente";
 }
 
-const Form = <T extends IUsuario>(props: FormProps<T>): JSX.Element => {
+const Form = <T extends Partial<IUsuario & ICliente>>(
+  props: FormProps<T>
+): JSX.Element => {
   const { form, handleChange, handleSubmit, handleSelectChange } = useForm<T>(
     props.editing
   );
@@ -33,6 +36,8 @@ const Form = <T extends IUsuario>(props: FormProps<T>): JSX.Element => {
       component="form"
       noValidate
       onSubmit={handleSubmit}
+      bgcolor="background.default"
+      height="100%"
       sx={{ width: props.width, padding: "2rem 1rem" }}
     >
       {props.type === "usuario" && (
@@ -42,14 +47,20 @@ const Form = <T extends IUsuario>(props: FormProps<T>): JSX.Element => {
           {...{ form, handleChange, handleSelectChange }}
         />
       )}
-      {/* {props.type === "cliente" && <ClienteForm/>} */}
+      {props.type === "cliente" && (
+        <ClienteForm
+          handleClose={props.handleClose}
+          editing={props.editing}
+          {...{ form, handleChange, handleSelectChange }}
+        />
+      )}
     </Box>
   );
 };
 
 interface UsuarioFormProps {
-  editing: IUsuario;
-  form: IUsuario;
+  editing: Partial<IUsuario>;
+  form: Partial<IUsuario>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClose: () => void;
   handleSelectChange: (e: SelectChangeEvent) => void;
@@ -135,6 +146,69 @@ const UsuarioForm = (props: UsuarioFormProps): JSX.Element => {
         name="telefono"
         autoComplete="tel"
         value={form.telefono}
+        onChange={handleChange}
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        sx={{ mt: 3 }}
+        onClick={handleClose}
+      >
+        Aceptar
+      </Button>
+    </>
+  );
+};
+interface ClienteFormProps {
+  editing: Partial<ICliente>;
+  form: Partial<ICliente>;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleClose: () => void;
+}
+
+const ClienteForm = (props: ClienteFormProps): JSX.Element => {
+  const { form, handleChange, handleClose } = props;
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+  const theme = useTheme();
+  return (
+    <>
+      <Typography
+        variant="h5"
+        component="h3"
+        color={theme.palette.primary.main}
+      >
+        Editando Cliente
+      </Typography>
+      <TextField
+        margin="normal"
+        fullWidth
+        name="nombre"
+        label="Nombre"
+        type="name"
+        id="nombre"
+        autoComplete="name"
+        value={form.nombre}
+        onChange={handleChange}
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        id="telefono"
+        label="Teléfono"
+        name="telefono"
+        autoComplete="tel"
+        value={form.telefono}
+        onChange={handleChange}
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        id="correo"
+        label="Correo"
+        name="correo"
+        autoComplete="tel"
+        value={form.correo}
         onChange={handleChange}
       />
       <Button

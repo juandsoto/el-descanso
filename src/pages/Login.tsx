@@ -22,17 +22,9 @@ import useForm from "../hooks/useForm";
 
 const Copyright = (props: any): JSX.Element => {
   return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
+    <Typography variant="body2" color="text.primary" align="center" {...props}>
       {"Copyright © "}
-      <Link color="inherit" href="#">
-        El Descanso | PYTS_TEAM
-      </Link>{" "}
-      {new Date().getFullYear()}
+      <Link href="#">El Descanso | PYTS_TEAM</Link> {new Date().getFullYear()}
       {"."}
     </Typography>
   );
@@ -51,7 +43,11 @@ const Login = (): JSX.Element => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     //TODO: Validar usuario y contraseña
-    setUser({ usuario: "juan", rol: "administrador" });
+    setUser({
+      nombre: "juan david soto",
+      usuario: "juan",
+      rol: "administrador",
+    });
     navigate("/el-descanso/administrador", {
       replace: true,
     });
@@ -59,7 +55,11 @@ const Login = (): JSX.Element => {
 
   return (
     <>
-      <Grid container component="main" sx={{ height: "100vh" }}>
+      <Grid
+        container
+        component="main"
+        sx={{ height: "100vh", bgcolor: theme.palette.background.default }}
+      >
         <CssBaseline />
         <Grid
           item
@@ -144,11 +144,10 @@ const Login = (): JSX.Element => {
         sx={{
           position: "fixed",
           bottom: "1rem",
-          left: "1rem",
+          right: "1rem",
           display: "flex",
           alignItems: "center",
           gap: "4px",
-          backgroundColor: "white",
           padding: "4px 12px",
           borderRadius: "20px",
           bgcolor: theme.palette.background.default,

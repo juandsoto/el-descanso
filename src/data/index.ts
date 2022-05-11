@@ -1,4 +1,4 @@
-import { IHabitacion } from "../interfaces/Habitacion";
+import ITipoHabitacion from "../interfaces/TipoHabitacion";
 import {
   SencillaImage,
   DobleImage,
@@ -17,6 +17,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import IHabitacion from "../interfaces/Habitacion";
+import IReserva from "../interfaces/Reserva";
 
 ChartJS.register(
   CategoryScale,
@@ -29,37 +31,37 @@ ChartJS.register(
   Legend
 );
 
-export const habitaciones: IHabitacion[] = [
+export const tipoHabitaciones: ITipoHabitacion[] = [
   {
-    name: "sencilla",
+    nombre: "sencilla",
     images: [SencillaImage, DobleImage, MatrimonialImage],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    price: 199900,
+    precio: 199900,
     services: ["restaurante"],
   },
   {
-    name: "doble",
+    nombre: "doble",
     images: [DobleImage, MatrimonialImage, SuiteSencillaImage],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    price: 199900,
+    precio: 199900,
     services: ["restaurante", "llamadas de larga distancia"],
   },
   {
-    name: "matrimonial",
+    nombre: "matrimonial",
     images: [MatrimonialImage, SuiteSencillaImage, SuitePresidencialImage],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    price: 199900,
+    precio: 199900,
     services: ["restaurante", "llamadas de larga distancia", "lavado"],
   },
   {
-    name: "suite sencilla",
+    nombre: "suite sencilla",
     images: [SuiteSencillaImage, SuitePresidencialImage, SencillaImage],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    price: 199900,
+    precio: 199900,
     services: [
       "restaurante",
       "llamadas de larga distancia",
@@ -68,11 +70,11 @@ export const habitaciones: IHabitacion[] = [
     ],
   },
   {
-    name: "suite presidencial",
+    nombre: "suite presidencial",
     images: [SuitePresidencialImage, SencillaImage, DobleImage],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    price: 199900,
+    precio: 199900,
     services: [
       "restaurante",
       "llamadas de larga distancia",
@@ -202,3 +204,132 @@ export const ventasMensuales = {
     ],
   },
 };
+
+export const habitaciones: IHabitacion[] = [
+  {
+    no_habitacion: 1,
+    estado: "disponible",
+    tipo: "sencilla",
+    precio: 150000,
+  },
+  {
+    no_habitacion: 2,
+    estado: "reservada",
+    tipo: "doble",
+    precio: 200000,
+  },
+  {
+    no_habitacion: 3,
+    estado: "ocupada",
+    tipo: "doble",
+    precio: 200000,
+  },
+  {
+    no_habitacion: 4,
+    estado: "disponible",
+    tipo: "matrimonial",
+    precio: 250000,
+  },
+  {
+    no_habitacion: 5,
+    estado: "disponible",
+    tipo: "matrimonial",
+    precio: 250000,
+  },
+  {
+    no_habitacion: 6,
+    estado: "reservada",
+    tipo: "suite sencilla",
+    precio: 300000,
+  },
+  {
+    no_habitacion: 7,
+    estado: "disponible",
+    tipo: "suite presidencial",
+    precio: 350000,
+  },
+  {
+    no_habitacion: 9,
+    estado: "disponible",
+    tipo: "suite presidencial",
+    precio: 350000,
+  },
+  {
+    no_habitacion: 10,
+    estado: "disponible",
+    tipo: "suite presidencial",
+    precio: 350000,
+  },
+  {
+    no_habitacion: 11,
+    estado: "disponible",
+    tipo: "suite presidencial",
+    precio: 350000,
+  },
+  {
+    no_habitacion: 12,
+    estado: "disponible",
+    tipo: "suite presidencial",
+    precio: 350000,
+  },
+  {
+    no_habitacion: 8,
+    estado: "ocupada",
+    tipo: "matrimonial",
+    precio: 250000,
+  },
+];
+
+export const hardReservas: IReserva[] = [
+  {
+    no_reserva: "1",
+    fecha_entrada: "2022-05-26T07:34",
+    numero_noches: 3,
+    cliente: {
+      id: "1",
+      nombre: "juan",
+      correo: "juan@test.com",
+      telefono: "123456789",
+    },
+    habitacion: {
+      no_habitacion: 1,
+      precio: 200000,
+      estado: "reservada",
+      tipo: "sencilla",
+    },
+  },
+  {
+    no_reserva: "2",
+    fecha_entrada: "2022-05-26T07:34",
+    numero_noches: 4,
+    cliente: {
+      id: "2",
+      nombre: "juan",
+      correo: "juan@test.com",
+      telefono: "123456789",
+    },
+    habitacion: {
+      no_habitacion: 2,
+      precio: 350000,
+      estado: "reservada",
+      tipo: "matrimonial",
+    },
+  },
+  {
+    no_reserva: "3",
+    fecha_entrada: "2022-05-26T07:34",
+    numero_noches: 1,
+    cliente: {
+      id: "3",
+      nombre: "juan",
+      correo: "juan@test.com",
+      telefono: "123456789",
+    },
+    habitacion: {
+      no_habitacion: 3,
+      precio: 400000,
+      estado: "reservada",
+      tipo: "suite",
+    },
+  },
+];

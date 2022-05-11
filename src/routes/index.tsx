@@ -1,16 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/auth/index";
-import {
-  Home,
-  Login,
-  ReservaDetail,
-  HabitacionDetail,
-  ServicioDetail,
-  Admin,
-  Recepcionista,
-  Gerente,
-  Cajero,
-} from "../pages";
+import { Home, Login, Admin, Recepcionista, Gerente, Cajero } from "../pages";
 
 interface ProtectedRouteProps {
   children: JSX.Element | JSX.Element[];
@@ -19,11 +9,11 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, path }: ProtectedRouteProps) => {
   const { user } = useAuth();
-  return (user && user.rol === path) || user.rol === "administrador" ? (
-    <>{children}</>
-  ) : (
-    <Navigate to="/el-descanso/login" />
-  );
+  if (!user.rol?.length) return <Navigate to="/el-descanso/" />;
+  if (user.rol === "administrador") return <>{children}</>;
+  if (user.rol === path) return <>{children}</>;
+
+  return <Navigate to={`/el-descanso/${user.rol}`} />;
 };
 
 interface Route {
@@ -65,6 +55,10 @@ const routes: Route[] = [
         <Cajero />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "*",
+    element: <Navigate to="/el-descanso/" />,
   },
 ];
 

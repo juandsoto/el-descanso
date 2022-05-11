@@ -1,18 +1,19 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme, Stack } from "@mui/material";
 import {
   Navbar,
   Hero,
   ReservarFormulario,
-  Habitaciones,
   Servicios,
   ThemeSwitch,
+  ListaTipoHabitacion,
 } from "../components";
 
 const Home = (): JSX.Element => {
   const theme = useTheme();
 
   return (
-    <Box
+    <Stack
+      spacing={3}
       sx={{
         bgcolor: theme.palette.background.default,
       }}
@@ -21,11 +22,11 @@ const Home = (): JSX.Element => {
         <Navbar />
         <Hero />
       </Box>
-      <Box minHeight="100vh" id="habitaciones">
-        <Habitaciones />
+      <Box id="habitaciones" px={2}>
+        <ListaTipoHabitacion />
       </Box>
 
-      <Box height="100vh" id="servicios">
+      <Box id="servicios">
         <Servicios bgImage />
       </Box>
 
@@ -49,7 +50,7 @@ const Home = (): JSX.Element => {
       >
         <ThemeSwitch />
       </Box>
-    </Box>
+    </Stack>
   );
 };
 

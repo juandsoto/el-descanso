@@ -11,20 +11,20 @@ import {
 } from "@mui/material";
 
 import StarRateIcon from "@mui/icons-material/StarRate";
-import { IHabitacion } from "../interfaces/Habitacion";
-import HabitacionModal from "./HabitacionModal";
+import ITipoHabitacion from "../interfaces/TipoHabitacion";
+import TipoHabitacionModal from "./TipoHabitacionModal";
 
 interface HabitacionProps {
-  habitacion: IHabitacion;
+  habitacion: ITipoHabitacion;
   minWidth?: string;
   maxWidth?: string;
 }
 
-const Habitacion = (props: HabitacionProps): JSX.Element => {
+const TipoHabitacion = (props: HabitacionProps): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<IHabitacion>(props.habitacion);
+  const [selected, setSelected] = useState<ITipoHabitacion>(props.habitacion);
 
-  const handleOpen = (habitacion: IHabitacion) => {
+  const handleOpen = (habitacion: ITipoHabitacion) => {
     setOpen(true);
     setSelected(habitacion);
   };
@@ -42,7 +42,7 @@ const Habitacion = (props: HabitacionProps): JSX.Element => {
       >
         <CardMedia
           component="img"
-          alt={props.habitacion.name}
+          alt={props.habitacion.nombre}
           height="140"
           image={props.habitacion.images[0]}
         />
@@ -53,7 +53,7 @@ const Habitacion = (props: HabitacionProps): JSX.Element => {
             component="div"
             textTransform="capitalize"
           >
-            {props.habitacion.name}
+            {props.habitacion.nombre}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {props.habitacion.description.slice(0, 80)}...
@@ -70,9 +70,9 @@ const Habitacion = (props: HabitacionProps): JSX.Element => {
           </Button>
         </CardActions>
       </Card>
-      <HabitacionModal {...{ open, handleClose, habitacion: selected }} />
+      <TipoHabitacionModal {...{ open, handleClose, habitacion: selected }} />
     </>
   );
 };
 
-export default Habitacion;
+export default TipoHabitacion;

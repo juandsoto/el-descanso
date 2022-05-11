@@ -1,4 +1,4 @@
-export default interface Cliente {
+export default interface ICliente {
   id: string;
   nombre: string;
   telefono: string;

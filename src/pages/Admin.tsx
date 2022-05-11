@@ -5,8 +5,9 @@ import {
   UserLayoutRight,
   Usuarios,
   Estadisticas,
-  HabitacionesList,
+  ListaTipoHabitacion,
   Servicios,
+  Clientes,
 } from "../components";
 
 const Admin = () => {
@@ -24,11 +25,11 @@ const Admin = () => {
           }}
         >
           <Estadisticas />
-          <HabitacionesList />
+          <ListaTipoHabitacion />
           <Servicios fullWidth />
           Reservas
           <Usuarios />
-          Clientes
+          <Clientes />
         </Box>
       </UserLayoutRight>
     </UserLayout>

@@ -18,9 +18,10 @@ import DehazeIcon from "@mui/icons-material/Dehaze";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import PaidIcon from "@mui/icons-material/Paid";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/auth/index";
 import ThemeSwitch from "./ThemeSwitch";
+import Avatar from "./Avatar";
 
 interface LayoutProps {
   children?: JSX.Element | JSX.Element[] | string;
@@ -35,6 +36,7 @@ const UserLayout = ({ children }: LayoutProps): JSX.Element => {
   return (
     <Box
       sx={{
+        color: "text.primary",
         minHeight: "100vh",
         width: "100%",
         display: "flex",
@@ -82,7 +84,9 @@ export const UserLayoutRight = (
           flexDirection: "column",
           marginLeft: { xs: "0px", md: "200px" },
           width: { xs: "100%", md: "calc(100% - 200px)" },
-          padding: ".5rem",
+          padding: ".6rem",
+          paddingBottom: "40px",
+          // backgroundImage: 'url("../../src/assets/images/bubble.png")',
         }}
       >
         <Stack
@@ -101,14 +105,16 @@ export const UserLayoutRight = (
           >
             {props.username}
           </Typography>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <DehazeIcon
-              sx={{ cursor: "pointer" }}
-              fontSize="large"
-              htmlColor={theme.palette.primary.main}
-              onClick={() => setShowNav(true)}
-            />
-          </Box>
+          <DehazeIcon
+            sx={{
+              display: { xs: "flex", md: "none" },
+              cursor: "pointer",
+            }}
+            onClick={() => setShowNav(true)}
+            fontSize="large"
+            width="100%"
+            htmlColor={theme.palette.primary.main}
+          />
         </Stack>
         <Divider />
         {props.children}
@@ -140,18 +146,22 @@ const navigation = [
 ];
 
 interface SidebarProps {
-	hasTitle?: boolean;
+  hasTitle?: boolean;
 }
 
 const Sidebar = (props: SidebarProps) => {
   const theme = useTheme();
   const { user } = useAuth();
+  const location = useLocation();
+  const active = location.pathname.split("/")[2];
 
   return (
     <Box
       width="100%"
       height="100%"
       sx={{
+        // minWidth: "200px",
+        bgcolor: "background.default",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -165,10 +175,15 @@ const Sidebar = (props: SidebarProps) => {
         justifyContent="start"
         alignItems="center"
         gap={2}
-        sx={{ flex: 1 }}
       >
         <Logo hasTitle={props.hasTitle} />
-        {user.rol === "administrador" && (
+        <Avatar />
+      </Box>
+      {user.rol === "administrador" && (
+        <Stack alignItems="center">
+          <Typography variant="h5" component="h4" color="primary.main">
+            Perfiles
+          </Typography>
           <List
             sx={{
               width: "100%",
@@ -178,11 +193,20 @@ const Sidebar = (props: SidebarProps) => {
               <ListItem
                 key={index}
                 disablePadding
-                sx={{ justifyContent: "start" }}
+                sx={{
+                  justifyContent: "center",
+                  borderLeft:
+                    item.title === active
+                      ? `3px solid ${theme.palette.primary.main}`
+                      : "",
+                }}
               >
                 <Link
                   to={`/el-descanso/${item.title}`}
-                  style={{ color: "inherit", textDecoration: "none" }}
+                  style={{
+                    color: "inherit",
+                    textDecoration: "none",
+                  }}
                 >
                   <ListItemButton>
                     <ListItemIcon sx={{ minWidth: "auto" }}>
@@ -200,8 +224,8 @@ const Sidebar = (props: SidebarProps) => {
               </ListItem>
             ))}
           </List>
-        )}
-      </Box>
+        </Stack>
+      )}
       <ThemeSwitch />
     </Box>
   );

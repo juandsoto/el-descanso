@@ -97,7 +97,7 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
 
   return (
     <Box
-      className={`${props.bgImage ? "blob" : ""}`}
+      // className={`${props.bgImage ? "blob" : ""}`}
       sx={{
         height: "100%",
         display: "flex",
@@ -133,9 +133,9 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {servicios.map(servicio => (
+            {servicios.map((servicio, i) => (
               <TableRow
-                key={servicio.habitacion}
+                key={i}
                 sx={{
                   "&:last-child td, &:last-child th": { border: 0 },
                 }}
@@ -148,14 +148,15 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
                     return (
                       <>
                         {user.rol === "administrador" ? (
-                          <Tooltip key={index} title="modificar" followCursor>
-                            <TableCell
-                              align="center"
-                              sx={{ cursor: "pointer" }}
-                              onClick={() =>
-                                toggleService(servicio.habitacion, item)
-                              }
-                            >
+                          <TableCell
+                            key={`${i}-${index}`}
+                            align="center"
+                            sx={{ cursor: "pointer" }}
+                            onClick={() =>
+                              toggleService(servicio.habitacion, item)
+                            }
+                          >
+                            <Tooltip title="modificar" followCursor>
                               {/*ts-ignore*/}
                               {servicio[item as keyof IServicio] ? (
                                 <CheckIcon
@@ -166,10 +167,10 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
                                   sx={{ color: "#f00", fontSize: "2rem" }}
                                 />
                               )}
-                            </TableCell>
-                          </Tooltip>
+                            </Tooltip>
+                          </TableCell>
                         ) : (
-                          <TableCell align="center" key={index}>
+                          <TableCell align="center" key={`${item}-${index}`}>
                             {/*ts-ignore*/}
                             {servicio[item as keyof IServicio] ? (
                               <CheckIcon

@@ -16,7 +16,7 @@ import {
   useTheme,
   Stack,
 } from "@mui/material";
-import { IHabitacion } from "../interfaces/Habitacion";
+import ITipoHabitacion from "../interfaces/TipoHabitacion";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import IronIcon from "@mui/icons-material/Iron";
@@ -27,17 +27,18 @@ import ImageSlider from "./ImageSlider";
 import { useAuth } from "../context/auth/index";
 import React from "react";
 import EditDialog from "./EditDialog";
+import { formatCurrency } from "../utils/index";
 
 interface HabitacionModalProps {
   open: boolean;
   handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
-  habitacion: IHabitacion;
+  habitacion: ITipoHabitacion;
 }
 
-const HabitacionModal = (props: HabitacionModalProps): JSX.Element => {
+const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
   const { open, handleClose, habitacion } = props;
   const [openDialog, setOpenDialog] = React.useState(false);
-  const [precio, setPrecio] = React.useState<number>(habitacion.price);
+  const [precio, setPrecio] = React.useState<number>(habitacion.precio);
   const theme = useTheme();
   const { user } = useAuth();
 
@@ -74,7 +75,7 @@ const HabitacionModal = (props: HabitacionModalProps): JSX.Element => {
   return (
     <Box>
       <Modal
-        aria-labelledby={`modal-${habitacion.name}`}
+        aria-labelledby={`modal-${habitacion.nombre}`}
         aria-describedby={`modal-${habitacion.description}`}
         open={open}
         onClose={handleClose}
@@ -94,11 +95,11 @@ const HabitacionModal = (props: HabitacionModalProps): JSX.Element => {
             >
               <Typography
                 textTransform="capitalize"
-                id={`modal-${habitacion.name}`}
+                id={`modal-${habitacion.nombre}`}
                 variant="h6"
                 component="h2"
               >
-                {habitacion.name}
+                {habitacion.nombre}
               </Typography>
               <Box display="flex">
                 {[0, 0, 0, 0, 0].map((star, index) => (
@@ -134,11 +135,7 @@ const HabitacionModal = (props: HabitacionModalProps): JSX.Element => {
               <Chip
                 variant="outlined"
                 color="primary"
-                label={new Intl.NumberFormat("es-CO", {
-                  style: "currency",
-                  currency: "COP",
-                  maximumFractionDigits: 0,
-                }).format(precio)}
+                label={formatCurrency(precio)}
                 sx={{
                   width: { xs: "auto", sm: "10rem" },
                   cursor: "text",
@@ -175,7 +172,7 @@ const HabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                     dialogInfo={{
                       title: "Editar Precio",
                       name: "precio",
-                      description: `Cambiar precio de la habitacion ${habitacion.name}`,
+                      description: `Cambiar precio de la habitacion ${habitacion.nombre}`,
                       onCancel: () => setOpenDialog(false),
                       onConfirm: (value: number) => {
                         setPrecio(value);
@@ -193,4 +190,4 @@ const HabitacionModal = (props: HabitacionModalProps): JSX.Element => {
   );
 };
 
-export default HabitacionModal;
+export default TipoHabitacionModal;

@@ -5,12 +5,15 @@ import "./index.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { AuthProvider } from "./context/auth";
 import Theme from "./Theme";
+import { ReservaProvider } from "./context/reserva";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Theme>
       <AuthProvider>
-        <App />
+        <ReservaProvider>
+          <App />
+        </ReservaProvider>
       </AuthProvider>
     </Theme>
   </React.StrictMode>

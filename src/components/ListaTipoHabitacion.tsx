@@ -1,15 +1,14 @@
 import { Typography, useTheme, Stack } from "@mui/material";
-import { habitaciones } from "../data";
-import Habitacion from "./Habitacion";
+import { tipoHabitaciones } from "../data";
+import TipoHabitacion from "./TipoHabitacion";
 
-const HabitacionesList = (): JSX.Element => {
+const ListaTipoHabitacion = (): JSX.Element => {
   const theme = useTheme();
   return (
     <Stack direction="row" flexDirection="column" justifyContent="start">
       <Typography
         variant="h4"
         component="h2"
-        padding={2}
         color={theme.palette.primary.main}
         textAlign="center"
       >
@@ -20,11 +19,15 @@ const HabitacionesList = (): JSX.Element => {
         direction="row"
         gap={1}
         sx={{ overflowX: "scroll", cursor: "grab" }}
-        pb={1}
+        py={2}
       >
-        {habitaciones.map((habitacion, index) => {
+        {tipoHabitaciones.map((habitacion, index) => {
           return (
-            <Habitacion key={index} habitacion={habitacion} minWidth="350px" />
+            <TipoHabitacion
+              key={index}
+              habitacion={habitacion}
+              minWidth="350px"
+            />
           );
         })}
       </Stack>
@@ -32,4 +35,4 @@ const HabitacionesList = (): JSX.Element => {
   );
 };
 
-export default HabitacionesList;
+export default ListaTipoHabitacion;

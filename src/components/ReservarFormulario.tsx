@@ -13,21 +13,24 @@ import { LogoImage } from "../assets/images";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
+import useForm from "../hooks/useForm";
+import ISolicitud from "../interfaces/Solicitud";
 
 const ReservarFormulario = (): JSX.Element => {
   const [send, setSend] = React.useState(false);
   const theme = useTheme();
+  const { form, handleChange, reset } = useForm<Omit<ISolicitud, "id">>({
+    correo: "",
+    nombre: "",
+    telefono: "",
+  });
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    console.log({
-      name: data.get("name"),
-      email: data.get("email"),
-      telefono: data.get("telefono"),
-    });
     setSend(true);
-    setTimeout(() => setSend(false), 2000);
+    console.log(form);
+    reset();
+    setTimeout(() => setSend(false), 3000);
   };
 
   return (
@@ -76,11 +79,12 @@ const ReservarFormulario = (): JSX.Element => {
             variant="standard"
             required
             fullWidth
-            id="name"
+            id="nombre"
             label="Nombre"
-            name="name"
+            name="nombre"
+            value={form.nombre}
+            onChange={handleChange}
             autoComplete="name"
-            autoFocus
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -94,9 +98,11 @@ const ReservarFormulario = (): JSX.Element => {
             variant="standard"
             required
             fullWidth
-            id="email"
-            label="Email"
-            name="email"
+            id="correo"
+            label="Correo"
+            name="correo"
+            value={form.correo}
+            onChange={handleChange}
             autoComplete="email"
             InputProps={{
               startAdornment: (
@@ -111,10 +117,12 @@ const ReservarFormulario = (): JSX.Element => {
             variant="standard"
             required
             fullWidth
+            id="telefono"
             name="telefono"
             label="Teléfono"
             type="tel"
-            id="telephone"
+            value={form.telefono}
+            onChange={handleChange}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

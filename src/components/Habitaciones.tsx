@@ -17,15 +17,29 @@ import {
 import useFilter from "../hooks/useFilter";
 import Filtro from "./Filtro";
 import { useReserva } from "../context/reserva";
-import { habitaciones } from "../data";
+import { hardHabitaciones } from "../data";
 import { useTheme } from "@mui/material/styles";
+import { Button } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import ConfirmDialog from "./ConfirmDialog";
 
-const Habitaciones = (): JSX.Element => {
+interface HabitacionesProps {}
+
+const Habitaciones = (props: HabitacionesProps): JSX.Element => {
   const { filtro: filtroEstado, handleChange: handleChangeEstado } =
     useFilter<EstadoHabitacion>("disponible");
   const { filtro: filtroTipo, handleChange: handleChangeTipo } =
     useFilter<NombreTipoHabitacion>("todas");
   const theme = useTheme();
+
+  const [habitaciones, setHabitaciones] =
+    React.useState<IHabitacion[]>(hardHabitaciones);
+
+  const [deleting, setDeleting] = React.useState<IHabitacion | null>();
+
+  const location = useLocation();
+
+  const inAdminPanel = location.pathname.split("/")[2] === "administrador";
 
   const habitacionesFiltradas = React.useMemo(
     () =>
@@ -36,7 +50,7 @@ const Habitaciones = (): JSX.Element => {
           habitacion.tipo === filtroTipo || filtroTipo === "todas";
         return filtroPorEstado && filtroPorTipo;
       }),
-    [filtroEstado, filtroTipo]
+    [habitaciones, filtroEstado, filtroTipo]
   );
 
   return (
@@ -112,11 +126,14 @@ const Habitaciones = (): JSX.Element => {
                   {column}
                 </TableCell>
               ))}
-              <TableCell align="center">Seleccionar</TableCell>
+              {!inAdminPanel && (
+                <TableCell align="center">Seleccionar</TableCell>
+              )}
+              {inAdminPanel && <TableCell align="center">Eliminar</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {habitacionesFiltradas.map((row, index) => {
+            {habitacionesFiltradas.map((habitacion, index) => {
               return (
                 <TableRow
                   key={index}
@@ -124,22 +141,55 @@ const Habitaciones = (): JSX.Element => {
                     "&:last-child td, &:last-child th": { border: 0 },
                   }}
                 >
-                  {Object.values(row).map((cell: string, index) => {
+                  {Object.values(habitacion).map((cell: string, index) => {
                     return (
                       <TableCell align="center" key={index}>
                         {cell}
                       </TableCell>
                     );
                   })}
-                  <TableCell align="center">
-                    <CheckHabitacion habitacion={row} />
-                  </TableCell>
+                  {!inAdminPanel && (
+                    <TableCell align="center">
+                      <CheckHabitacion habitacion={habitacion} />
+                    </TableCell>
+                  )}
+                  {inAdminPanel && (
+                    <TableCell align="center">
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => setDeleting(habitacion)}
+                      >
+                        eliminar
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               );
             })}
           </TableBody>
         </MuiTable>
       </TableContainer>
+      {inAdminPanel && (
+        <ConfirmDialog
+          open={!!deleting}
+          handleClose={() => setDeleting(null)}
+          dialogInfo={{
+            title: `Eliminar habitación no.${deleting?.no_habitacion}`,
+            description: `¿Está seguro que desea eliminar esta habitación?`,
+            onCancel: () => setDeleting(null),
+            onConfirm: () => {
+              setHabitaciones(prev =>
+                prev.filter(
+                  habitacion =>
+                    habitacion.no_habitacion !== deleting!.no_habitacion
+                )
+              );
+              setDeleting(null);
+            },
+          }}
+        />
+      )}
     </Stack>
   );
 };

@@ -20,6 +20,7 @@ import ICliente from "../interfaces/Cliente";
 
 interface FormProps<T> {
   editing: T;
+  onConfirm: (row: T) => void;
   width: string;
   handleClose: () => void;
   type: "usuario" | "cliente";
@@ -44,12 +45,18 @@ const Form = <T extends Partial<IUsuario & ICliente>>(
         <UsuarioForm
           handleClose={props.handleClose}
           editing={props.editing}
+          onConfirm={
+            props.onConfirm as (row: Partial<ICliente & ICliente>) => void
+          }
           {...{ form, handleChange, handleSelectChange }}
         />
       )}
       {props.type === "cliente" && (
         <ClienteForm
           handleClose={props.handleClose}
+          onConfirm={
+            props.onConfirm as (row: Partial<ICliente & ICliente>) => void
+          }
           editing={props.editing}
           {...{ form, handleChange, handleSelectChange }}
         />
@@ -60,6 +67,7 @@ const Form = <T extends Partial<IUsuario & ICliente>>(
 
 interface UsuarioFormProps {
   editing: Partial<IUsuario>;
+  onConfirm: (row: Partial<IUsuario & ICliente>) => void;
   form: Partial<IUsuario>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClose: () => void;
@@ -153,7 +161,7 @@ const UsuarioForm = (props: UsuarioFormProps): JSX.Element => {
         variant="contained"
         fullWidth
         sx={{ mt: 3 }}
-        onClick={handleClose}
+        onClick={() => props.onConfirm(form as IUsuario)}
       >
         Aceptar
       </Button>
@@ -162,6 +170,7 @@ const UsuarioForm = (props: UsuarioFormProps): JSX.Element => {
 };
 interface ClienteFormProps {
   editing: Partial<ICliente>;
+  onConfirm: (row: Partial<ICliente>) => void;
   form: Partial<ICliente>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClose: () => void;
@@ -216,7 +225,7 @@ const ClienteForm = (props: ClienteFormProps): JSX.Element => {
         variant="contained"
         fullWidth
         sx={{ mt: 3 }}
-        onClick={handleClose}
+        onClick={() => props.onConfirm(form)}
       >
         Aceptar
       </Button>

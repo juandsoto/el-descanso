@@ -22,10 +22,12 @@ import ICliente from "../interfaces/Cliente";
 import { useAuth } from "../context/auth";
 import { useReserva } from "../context/reserva/index";
 import IReserva from "../interfaces/Reserva";
+import { useLocation } from "react-router-dom";
 
 interface TableProps<T> {
   title: string;
   rows: T[];
+  setRows: (rows: T[]) => void;
   type: "usuario" | "cliente";
   fullWidth?: boolean;
   initialSelected: T;
@@ -58,6 +60,9 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
   const [selected, setSelected] = React.useState<T>(props.initialSelected);
   const { user } = useAuth();
   const theme = useTheme();
+  const location = useLocation();
+
+  const inAdminPanel = location.pathname.split("/")[2] === "administrador";
 
   let SUBJECT: ICliente | IUsuario =
     props.type === "usuario" ? USUARIO : CLIENTE;
@@ -122,10 +127,10 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
                     {column}
                   </TableCell>
                 ))}
-                {props.type === "cliente" && (
+                {!inAdminPanel && (
                   <TableCell align="center">Seleccionar</TableCell>
                 )}
-                {user.rol === "administrador" && (
+                {inAdminPanel && (
                   <>
                     <TableCell align="center">Editar</TableCell>
                     <TableCell align="center">Eliminar</TableCell>
@@ -149,12 +154,12 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
                         </TableCell>
                       );
                     })}
-                    {props.type === "cliente" && (
+                    {!inAdminPanel && (
                       <TableCell align="center">
                         <CheckCliente cliente={row as ICliente} />
                       </TableCell>
                     )}
-                    {user.rol === "administrador" && (
+                    {inAdminPanel && (
                       <>
                         <TableCell align="center">
                           <Button
@@ -186,25 +191,32 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
           </MuiTable>
         </TableContainer>
       </Box>
-      <EditDrawer
-        handleClose={() => setIsEditing(false)}
-        open={isEditing}
-        editing={selected}
-        type={props.type}
-      />
-      <ConfirmDialog
-        open={isDeleting}
-        handleClose={() => setIsDeleting(false)}
-        dialogInfo={{
-          title: `Eliminar ${props.type}`,
-          description: `¿Está seguro que desea eliminar este ${props.type}?`,
-          onCancel: () => setIsDeleting(false),
-          onConfirm: () => {
-            alert("eliminado satisfactoriamente");
-            setIsDeleting(false);
-          },
-        }}
-      />
+      {inAdminPanel && (
+        <>
+          <EditDrawer
+            handleClose={() => setIsEditing(false)}
+            open={isEditing}
+            editing={selected}
+            type={props.type}
+            onConfirm={(row: T) => {
+              props.setRows(props.rows.map(r => (r.id === row.id ? row : r)));
+            }}
+          />
+          <ConfirmDialog
+            open={isDeleting}
+            handleClose={() => setIsDeleting(false)}
+            dialogInfo={{
+              title: `Eliminar ${props.type}`,
+              description: `¿Está seguro que desea eliminar este ${props.type}?`,
+              onCancel: () => setIsDeleting(false),
+              onConfirm: () => {
+                alert("eliminado satisfactoriamente");
+                setIsDeleting(false);
+              },
+            }}
+          />
+        </>
+      )}
     </>
   );
 };

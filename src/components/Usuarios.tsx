@@ -200,7 +200,7 @@ const Usuarios = (): JSX.Element => {
           .includes(search.toLowerCase());
         return inNombre || inId || inTelefono || inRol || inUsuario;
       }),
-    [search]
+    [usuarios, search]
   );
 
   const onChangeSearch = React.useCallback(
@@ -214,6 +214,7 @@ const Usuarios = (): JSX.Element => {
       type="usuario"
       fullWidth
       rows={filtroUsuarios}
+      setRows={setUsuarios}
       search={search}
       setSearch={setSearch}
       onChangeSearch={onChangeSearch}

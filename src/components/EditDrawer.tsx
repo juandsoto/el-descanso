@@ -8,6 +8,7 @@ interface EditDrawerProps<T> {
   open: boolean;
   type: "usuario" | "cliente";
   handleClose: () => void;
+  onConfirm: (row: T) => void;
 }
 
 const EditDrawer = <T extends Partial<IUsuario & ICliente>>(
@@ -20,6 +21,7 @@ const EditDrawer = <T extends Partial<IUsuario & ICliente>>(
     <Drawer anchor="right" open={props.open} onClose={props.handleClose}>
       <Form
         type={props.type}
+        onConfirm={props.onConfirm}
         width={isSmallScreen ? "80vw" : "30vw"}
         editing={props.editing}
         handleClose={props.handleClose}

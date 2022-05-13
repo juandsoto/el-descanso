@@ -12,7 +12,7 @@ const ListaTipoHabitacion = (): JSX.Element => {
         color={theme.palette.primary.main}
         textAlign="center"
       >
-        Habitaciones
+        Tipos de habitaciones
       </Typography>
       <Stack
         className="hide-scrollbar"

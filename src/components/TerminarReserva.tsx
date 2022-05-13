@@ -107,11 +107,6 @@ interface HabitacionIndividualProps {
 const HabitacionIndividual = (props: HabitacionIndividualProps) => {
   const { setReserva } = useReserva();
 
-  React.useEffect(
-    () => console.log(typeof props.habitacion.fecha_entrada),
-    [props.habitacion.fecha_entrada]
-  );
-
   React.useEffect(() => {
     if (!!props.habitacion.numero_noches) return;
 

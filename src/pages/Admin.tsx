@@ -1,4 +1,5 @@
 import { Box, useTheme } from "@mui/material";
+import Habitaciones from "../components/Habitaciones";
 import {
   UserLayout,
   UserLayoutLeft,
@@ -26,6 +27,7 @@ const Admin = () => {
         >
           <Estadisticas />
           <ListaTipoHabitacion />
+          <Habitaciones />
           <Servicios fullWidth />
           Reservas
           <Usuarios />

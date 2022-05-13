@@ -60,7 +60,9 @@ const initialSelected: ICliente = {
   correo: "",
 };
 
-const Clientes = (): JSX.Element => {
+interface ClientesProps {}
+
+const Clientes = (props: ClientesProps): JSX.Element => {
   const [clientes, setClientes] = React.useState<ICliente[]>(rows);
   const [search, setSearch] = React.useState<string>("");
 
@@ -79,7 +81,7 @@ const Clientes = (): JSX.Element => {
           .includes(search.toLowerCase());
         return inNombre || inId || inTelefono || inCorreo;
       }),
-    [search]
+    [clientes, search]
   );
 
   const onChangeSearch = React.useCallback(
@@ -99,6 +101,7 @@ const Clientes = (): JSX.Element => {
       type="cliente"
       fullWidth
       rows={filtroClientes}
+      setRows={setClientes}
       search={search}
       setSearch={setSearch}
       onChangeSearch={onChangeSearch}

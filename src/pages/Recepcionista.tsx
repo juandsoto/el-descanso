@@ -7,7 +7,7 @@ import {
   Solicitudes,
   Descuento,
 } from "../components";
-import Checkin from "../components/Checkin";
+import Checkin from "../components/ConsultarReserva";
 import CustomStepper from "../components/CustomStepper";
 
 const Recepcionista = (): JSX.Element => {

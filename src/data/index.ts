@@ -205,7 +205,7 @@ export const ventasMensuales = {
   },
 };
 
-export const habitaciones: IHabitacion[] = [
+export const hardHabitaciones: IHabitacion[] = [
   {
     no_habitacion: 1,
     estado: "disponible",

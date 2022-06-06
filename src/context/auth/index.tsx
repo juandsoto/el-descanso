@@ -6,19 +6,21 @@ interface Props {
   children: JSX.Element | JSX.Element[];
 }
 
+type Auth = Omit<IUsuario, "password"> & { token: string };
+
 interface IAuthContext {
-  user: Partial<IUsuario>;
-  setUser: React.Dispatch<React.SetStateAction<Partial<IUsuario> | null>>;
+  user: Auth;
+  setUser: React.Dispatch<React.SetStateAction<Auth | null>>;
   logout: () => void;
 }
 
-const initialUser: IUsuario = {
+const initialUser: Auth = {
   nombre: "",
   rol: "",
-  usuario: "",
-  contraseña: "",
+  username: "",
   telefono: "",
   id: "",
+  token: "",
 };
 
 const AuthContext = React.createContext<IAuthContext>({
@@ -26,7 +28,7 @@ const AuthContext = React.createContext<IAuthContext>({
 } as IAuthContext);
 
 export const AuthProvider = ({ children }: Props): JSX.Element => {
-  const [user, setUser] = useLocalStorage<Partial<IUsuario> | null>("user");
+  const [user, setUser] = useLocalStorage<Auth | null>("user");
 
   const logout = () => setUser(initialUser);
 

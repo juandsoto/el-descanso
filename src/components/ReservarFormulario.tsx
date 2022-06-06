@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   InputAdornment,
@@ -15,6 +13,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
 import useForm from "../hooks/useForm";
 import ISolicitud from "../interfaces/Solicitud";
+import toast from "react-hot-toast";
 
 const ReservarFormulario = (): JSX.Element => {
   const [send, setSend] = React.useState(false);
@@ -23,6 +22,7 @@ const ReservarFormulario = (): JSX.Element => {
     correo: "",
     nombre: "",
     telefono: "",
+    estado: "",
   });
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,7 +30,12 @@ const ReservarFormulario = (): JSX.Element => {
     setSend(true);
     console.log(form);
     reset();
-    setTimeout(() => setSend(false), 3000);
+    toast.success(
+      "¡Genial! Hemos recibido tu solicitud. Pronto te llamaremos",
+      {
+        duration: 3500,
+      }
+    );
   };
 
   return (
@@ -43,7 +48,7 @@ const ReservarFormulario = (): JSX.Element => {
       pb={1}
       sx={{
         position: "relative",
-        background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, rgba(12,176,169,1) 200%)`,
+        background: `linear-gradient(180deg, ${theme.palette.background.default} 50%, rgba(12,176,169,1) 80%)`,
       }}
     >
       <Box>
@@ -136,20 +141,6 @@ const ReservarFormulario = (): JSX.Element => {
           </Button>
         </Box>
       </Box>
-      {send && (
-        <Alert
-          severity="success"
-          sx={{
-            position: "absolute",
-            left: "1rem",
-            bottom: "1rem",
-            backgroundColor: "rgba(255,255,255,0.9)",
-          }}
-        >
-          <AlertTitle>¡Genial!</AlertTitle>
-          Hemos recibido tu solicitud — <strong>¡pronto de llamaremos!</strong>
-        </Alert>
-      )}
     </Box>
   );
 };

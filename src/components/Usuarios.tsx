@@ -1,204 +1,38 @@
 import Table from "./Table";
 import { IUsuario } from "../interfaces/Usuario";
 import React from "react";
-
-const rows: IUsuario[] = [
-  {
-    id: "1",
-    telefono: "123456789",
-    usuario: "juan",
-    nombre: "juan david",
-    contraseña: "recepcionista",
-    rol: "recepcionista",
-  },
-  {
-    id: "2",
-    telefono: "123456789",
-    usuario: "nata",
-    nombre: "natalia",
-    contraseña: "gerente",
-    rol: "gerente",
-  },
-  {
-    id: "3",
-    telefono: "123456789",
-    usuario: "mauricio",
-    nombre: "mauricio",
-    contraseña: "administrador",
-    rol: "administrador",
-  },
-  {
-    id: "4",
-    telefono: "123456789",
-    usuario: "adrian",
-    nombre: "adrian",
-    contraseña: "cajero",
-    rol: "cajero",
-  },
-  {
-    id: "5",
-    telefono: "123456789",
-    usuario: "andres",
-    nombre: "andres",
-    contraseña: "cajero2",
-    rol: "cajero",
-  },
-  {
-    id: "1",
-    telefono: "123456789",
-    usuario: "juan",
-    nombre: "juan david",
-    contraseña: "recepcionista",
-    rol: "recepcionista",
-  },
-  {
-    id: "2",
-    telefono: "123456789",
-    usuario: "nata",
-    nombre: "natalia",
-    contraseña: "gerente",
-    rol: "gerente",
-  },
-  {
-    id: "3",
-    telefono: "123456789",
-    usuario: "mauricio",
-    nombre: "mauricio",
-    contraseña: "administrador",
-    rol: "administrador",
-  },
-  {
-    id: "4",
-    telefono: "123456789",
-    usuario: "adrian",
-    nombre: "adrian",
-    contraseña: "cajero",
-    rol: "cajero",
-  },
-  {
-    id: "5",
-    telefono: "123456789",
-    usuario: "andres",
-    nombre: "andres",
-    contraseña: "cajero2",
-    rol: "cajero",
-  },
-  {
-    id: "1",
-    telefono: "123456789",
-    usuario: "juan",
-    nombre: "juan david",
-    contraseña: "recepcionista",
-    rol: "recepcionista",
-  },
-  {
-    id: "2",
-    telefono: "123456789",
-    usuario: "nata",
-    nombre: "natalia",
-    contraseña: "gerente",
-    rol: "gerente",
-  },
-  {
-    id: "3",
-    telefono: "123456789",
-    usuario: "mauricio",
-    nombre: "mauricio",
-    contraseña: "administrador",
-    rol: "administrador",
-  },
-  {
-    id: "4",
-    telefono: "123456789",
-    usuario: "adrian",
-    nombre: "adrian",
-    contraseña: "cajero",
-    rol: "cajero",
-  },
-  {
-    id: "5",
-    telefono: "123456789",
-    usuario: "andres",
-    nombre: "andres",
-    contraseña: "cajero2",
-    rol: "cajero",
-  },
-  {
-    id: "1",
-    telefono: "123456789",
-    usuario: "juan",
-    nombre: "juan david",
-    contraseña: "recepcionista",
-    rol: "recepcionista",
-  },
-  {
-    id: "2",
-    telefono: "123456789",
-    usuario: "nata",
-    nombre: "natalia",
-    contraseña: "gerente",
-    rol: "gerente",
-  },
-  {
-    id: "3",
-    telefono: "123456789",
-    usuario: "mauricio",
-    nombre: "mauricio",
-    contraseña: "administrador",
-    rol: "administrador",
-  },
-  {
-    id: "4",
-    telefono: "123456789",
-    usuario: "adrian",
-    nombre: "adrian",
-    contraseña: "cajero",
-    rol: "cajero",
-  },
-  {
-    id: "5",
-    telefono: "123456789",
-    usuario: "andres",
-    nombre: "andres",
-    contraseña: "cajero2",
-    rol: "cajero",
-  },
-];
+import useAxios from "../hooks/useAxios";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/auth/index";
+import useUsuarios from "../hooks/useUsuarios";
 
 const initialSelected: IUsuario = {
   id: "",
   nombre: "",
-  usuario: "",
-  contraseña: "",
+  username: "",
+  password: "",
   rol: "",
   telefono: "",
 };
 
 const Usuarios = (): JSX.Element => {
-  const [usuarios, setUsuarios] = React.useState<IUsuario[]>(rows);
-
-  // React.useEffect(() => {
-  // 	/**
-  // 	 * Fetch usuarios
-  // 	 */
-  // },[])
+  const { usuarios, createUser, updateUser, deleteUser } = useUsuarios();
   const [search, setSearch] = React.useState<string>("");
 
   const filtroUsuarios = React.useMemo(
     () =>
-      usuarios.filter(usuario => {
+      usuarios?.filter(usuario => {
         const inNombre = usuario.nombre
           .toLowerCase()
           .includes(search.toLowerCase());
-        const inId = usuario.id.toLowerCase().includes(search.toLowerCase());
-        const inTelefono = usuario.telefono
+        const inId = usuario.id.startsWith(search);
+        const inRol = usuario.rol
           .toLowerCase()
-          .includes(search.toLowerCase());
-        const inRol = usuario.rol.toLowerCase().includes(search.toLowerCase());
-        const inUsuario = usuario.usuario
+          .startsWith(search.toLowerCase());
+        const inUsuario = usuario.username
           .toLowerCase()
-          .includes(search.toLowerCase());
-        return inNombre || inId || inTelefono || inRol || inUsuario;
+          .startsWith(search.toLowerCase());
+        return inNombre || inId || inRol || inUsuario;
       }),
     [usuarios, search]
   );
@@ -213,12 +47,15 @@ const Usuarios = (): JSX.Element => {
       title="Usuarios"
       type="usuario"
       fullWidth
-      rows={filtroUsuarios}
-      setRows={setUsuarios}
+      rows={filtroUsuarios ?? []}
+      // setRows={setUsuarios}
       search={search}
       setSearch={setSearch}
       onChangeSearch={onChangeSearch}
       initialSelected={initialSelected}
+      onCreate={createUser}
+      onUpdate={updateUser}
+      onDelete={deleteUser}
     />
   );
 };

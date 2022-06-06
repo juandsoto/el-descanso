@@ -1,11 +1,19 @@
 import React from "react";
-import { Box, Typography, Divider, TextField, Avatar } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Divider,
+  TextField,
+  Avatar,
+  Stack,
+} from "@mui/material";
 import { additionalReserva, useReserva } from "../context/reserva/index";
 import IReserva from "../interfaces/Reserva";
 import IHabitacion from "../interfaces/Habitacion";
-import Stack from "@mui/material/Stack";
 import { formatCurrency } from "../utils";
 import { useTheme } from "@mui/material/styles";
+import moment from "moment";
+import { motion } from "framer-motion";
 
 const TerminarReserva = () => {
   const { reserva } = useReserva();
@@ -88,7 +96,9 @@ const TerminarReserva = () => {
           <Stack direction="row" justifyContent="flex-end">
             <Typography
               variant="subtitle1"
-              component="span"
+              component={motion.span}
+              layout
+              transition={{ ease: "easeOut", duration: 0.5 }}
               color="primary.main"
             >
               Total - {formatCurrency(precioTotal())}
@@ -162,19 +172,23 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
             props.habitacion.tipo
           } - ${formatCurrency(props.habitacion.precio || 0)}`}
         </Typography>
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} alignItems="center">
           <TextField
-            sx={{ width: { xs: "12rem", sm: "14.2rem" } }}
+            sx={{ width: { xs: "auto", sm: "14.2rem" } }}
             size="small"
             label="fecha de entrada"
             InputLabelProps={{
               shrink: true,
+            }}
+            inputProps={{
+              min: moment(new Date()).format("YYYY-MM-DD[T]HH:mm:ss"),
             }}
             name="fecha_entrada"
             value={props.habitacion.fecha_entrada ?? ""}
             onChange={onChange}
             type="datetime-local"
           />
+
           <TextField
             sx={{ width: "5rem" }}
             size="small"
@@ -184,9 +198,18 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
             onChange={onChange}
             type="number"
           />
+          <Typography>
+            {formatCurrency(
+              (props.habitacion.precio || 0) *
+                (props.habitacion.numero_noches ?? 1)
+            )}
+          </Typography>
         </Stack>
       </Stack>
       <Divider variant="fullWidth" sx={{ marginY: 0.5 }} />
+      {/* <Box sx={{ minHeight: "20vh", bgcolor: "primary", zIndex: 99 }}>
+        <Datetime />
+      </Box> */}
     </>
   );
 };

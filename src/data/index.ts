@@ -13,12 +13,15 @@ import {
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
 import IHabitacion from "../interfaces/Habitacion";
 import IReserva from "../interfaces/Reserva";
+import IAvailableServices from "../interfaces/AvailableServices";
+import { NombreTipoHabitacion } from "../interfaces/TipoHabitacion";
 
 ChartJS.register(
   CategoryScale,
@@ -26,10 +29,15 @@ ChartJS.register(
   PointElement,
   LineElement,
   BarElement,
+  BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend
 );
+
+export const nombreTipoHabitaciones: Exclude<NombreTipoHabitacion, "todas">[] =
+  ["sencilla", "doble", "matrimonial", "suite sencilla", "suite presidencial"];
 
 export const tipoHabitaciones: ITipoHabitacion[] = [
   {
@@ -58,7 +66,12 @@ export const tipoHabitaciones: ITipoHabitacion[] = [
   },
   {
     nombre: "suite sencilla",
-    images: [SuiteSencillaImage, SuitePresidencialImage, SencillaImage],
+    images: [
+      SuiteSencillaImage,
+      SuitePresidencialImage,
+      SencillaImage,
+      "https://images.unsplash.com/photo-1616046229478-9901c5536a45?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80",
+    ],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
     precio: 199900,
@@ -85,17 +98,18 @@ export const tipoHabitaciones: ITipoHabitacion[] = [
   },
 ];
 
-export const usoDeServiciosLabels = [
-  "Restaurante",
-  "Llamadas",
-  "Lavado",
-  "Planchado",
-  "Bar",
+export const nombreServicios = [
+  "restaurante",
+  "llamadas",
+  "lavado",
+  "planchado",
+  "bar",
 ];
 
 export const usoDeServicios = {
   options: {
     responsive: true,
+
     plugins: {
       legend: {
         position: "top" as const,
@@ -103,18 +117,28 @@ export const usoDeServicios = {
       title: {
         display: true,
         text: "Uso de servicios",
+        font: {
+          size: 16,
+        },
       },
     },
   },
   data: {
-    labels: usoDeServiciosLabels,
+    labels: nombreServicios,
     datasets: [
       {
         label: "numero de reservas en que se usa el servicio",
-        data: usoDeServiciosLabels.map(
-          (_, index) => index * Math.round(Math.random() * 10)
+        data: nombreServicios.map(
+          (_, index) => (index + 1) * Math.round(Math.random() * 10)
         ),
-        backgroundColor: "rgba(233, 30, 155, 0.5)",
+        borderWidth: 0,
+        backgroundColor: [
+          "rgba(39, 60, 117,0.9)",
+          "rgba(255, 56, 56,0.9)",
+          "rgba(50, 255, 126,0.9)",
+          "rgba(125, 95, 255,0.9)",
+          "rgba(23, 192, 235,0.9)",
+        ],
       },
     ],
   },
@@ -158,11 +182,27 @@ export const ocupacionHotel = {
     responsive: true,
     plugins: {
       legend: {
-        position: "top" as const,
+        display: false,
       },
       title: {
         display: true,
-        text: "Porcentaje ocupacion hotel - abril",
+        text: "Porcentaje ocupacion hotel",
+        font: {
+          size: 16,
+        },
+      },
+    },
+    layout: { padding: 10 },
+    scales: {
+      y: {
+        grid: {
+          display: false,
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
       },
     },
   },
@@ -184,11 +224,27 @@ export const ventasMensuales = {
     responsive: true,
     plugins: {
       legend: {
-        position: "top" as const,
+        display: false,
       },
       title: {
         display: true,
-        text: `Ventas mensuales - abril`,
+        text: "Ventas mensuales",
+        font: {
+          size: 16,
+        },
+      },
+    },
+    layout: { padding: 10 },
+    scales: {
+      y: {
+        grid: {
+          display: false,
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
       },
     },
   },
@@ -197,9 +253,53 @@ export const ventasMensuales = {
     datasets: [
       {
         label: "Ventas",
-        data: diasLabels.map((_, index) => index * Math.random() * 10),
+        data: diasLabels.map((_, index) => index * Math.random() * 1000000),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  },
+};
+
+export const ventasMensualesPorServicio = {
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Ventas mensuales por servicio",
+        font: {
+          size: 16,
+        },
+      },
+    },
+    layout: { padding: 10 },
+    scales: {
+      y: {
+        grid: {
+          display: false,
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+    },
+  },
+  data: {
+    labels: nombreServicios,
+    datasets: [
+      {
+        label: "Ventas",
+        data: nombreServicios.map(
+          (_, index) => index * Math.random() * 1000000
+        ),
+        borderColor: "rgb(23, 192, 235)",
+        backgroundColor: "rgba(23, 192, 235,0.5)",
       },
     ],
   },
@@ -283,7 +383,7 @@ export const hardHabitaciones: IHabitacion[] = [
 export const hardReservas: IReserva[] = [
   {
     no_reserva: "1",
-    fecha_entrada: "2022-05-26T07:34",
+    fecha_entrada: new Date(),
     numero_noches: 3,
     cliente: {
       id: "1",
@@ -299,8 +399,25 @@ export const hardReservas: IReserva[] = [
     },
   },
   {
+    no_reserva: "3",
+    fecha_entrada: new Date(),
+    numero_noches: 1,
+    cliente: {
+      id: "1",
+      nombre: "juan",
+      correo: "juan@test.com",
+      telefono: "123456789",
+    },
+    habitacion: {
+      no_habitacion: 3,
+      precio: 400000,
+      estado: "reservada",
+      tipo: "suite presidencial",
+    },
+  },
+  {
     no_reserva: "2",
-    fecha_entrada: "2022-05-26T07:34",
+    fecha_entrada: new Date(),
     numero_noches: 4,
     cliente: {
       id: "2",
@@ -315,21 +432,47 @@ export const hardReservas: IReserva[] = [
       tipo: "matrimonial",
     },
   },
+];
+
+export const availableServices: IAvailableServices[] = [
   {
-    no_reserva: "3",
-    fecha_entrada: "2022-05-26T07:34",
-    numero_noches: 1,
-    cliente: {
-      id: "3",
-      nombre: "juan",
-      correo: "juan@test.com",
-      telefono: "123456789",
-    },
-    habitacion: {
-      no_habitacion: 3,
-      precio: 400000,
-      estado: "reservada",
-      tipo: "suite",
-    },
+    habitacion: "Sencilla",
+    restaurante: true,
+    llamadas: false,
+    lavado: false,
+    planchado: false,
+    bar: false,
+  },
+  {
+    habitacion: "Doble",
+    restaurante: true,
+    llamadas: true,
+    lavado: false,
+    planchado: false,
+    bar: false,
+  },
+  {
+    habitacion: "Matrimonial",
+    restaurante: true,
+    llamadas: true,
+    lavado: true,
+    planchado: false,
+    bar: false,
+  },
+  {
+    habitacion: "Suite Sencilla",
+    restaurante: true,
+    llamadas: true,
+    lavado: true,
+    planchado: true,
+    bar: false,
+  },
+  {
+    habitacion: "Suite Presidencial",
+    restaurante: true,
+    llamadas: true,
+    lavado: true,
+    planchado: true,
+    bar: true,
   },
 ];

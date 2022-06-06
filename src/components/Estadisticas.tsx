@@ -6,149 +6,58 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import LineChart from "./LineChart";
 import React from "react";
+import ChartLayout from "./ChartLayout";
 import EditDialog from "./EditDialog";
-import { ocupacionHotel, usoDeServicios } from "../data";
-import { Bar, Line } from "react-chartjs-2";
+import { ocupacionHotel, usoDeServicios, ventasMensuales } from "../data";
+import { Bar, Line, Doughnut } from "react-chartjs-2";
 import { useAuth } from "../context/auth/index";
+import { ventasMensualesPorServicio } from "../data/index";
+import OcupacionHotelChart from "./OcupacionHotelChart";
+import UsoDeServiciosChart from "./UsoDeServiciosChart";
+import CancelacionDeReservas from "./CancelacionDeReservas";
+import VentasPorServicioChart from "./VentasPorServicioChart";
+import VentasMensualesChart from "./VentasMensualesChart";
+import Descuento from "./Descuento";
 
 const Estadisticas = (): JSX.Element => {
+  // const ref = React.useRef<ForwardedRef<ChartJSOrUndefined<"bar", number[], string>>>();
+
+  // const download = React.useCallback(() => {
+  // 	const link = document.createElement('a');
+  // 	link.download = 'chart.png';
+  // 	link.href = ref.current.toBase64Image();
+  // 	link.click();
+  // }, []);
   return (
     <Grid container spacing={2} alignItems="center">
-      <Grid item xs={12} md={6}>
-        <Bar options={usoDeServicios.options} data={usoDeServicios.data} />
+      <Grid item xs={12} md={7} lg={8} position="relative">
+        <OcupacionHotelChart />
       </Grid>
-      <Grid item xs={12} md={6}>
-        <Line options={ocupacionHotel.options} data={ocupacionHotel.data} />
+      <Grid item xs={12} md={5} lg={4}>
+        <UsoDeServiciosChart />
       </Grid>
-      <Grid item xs={12} md={3}>
+      <Grid item xs={12}>
         <Stack
-          spacing={4}
           textAlign="center"
-          direction={{ xs: "row", md: "column" }}
+          direction="row"
+          flexWrap="wrap"
           alignItems="center"
-          justifyContent="center"
+          justifyContent="space-around"
+          sx={{ gap: 2 }}
         >
-          <Descuento />
-          <Cancelacion />
+          <Descuento type="persona natural" />
+          <CancelacionDeReservas />
+          <Descuento type="cliente corporativo" />
         </Stack>
       </Grid>
-      <Grid item xs={12} md={9}>
-        <LineChart />
+      <Grid item xs={12} position="relative">
+        <VentasPorServicioChart />
+      </Grid>
+      <Grid item xs={12} position="relative">
+        <VentasMensualesChart />
       </Grid>
     </Grid>
-  );
-};
-
-const Cancelacion = (): JSX.Element => {
-  const [cancelacion, setCancelacion] = React.useState(0);
-
-  React.useEffect(() => {
-    setCancelacion(3);
-  }, []);
-
-  return (
-    <Stack
-      direction="column"
-      alignItems="center"
-      justifyContent="space-between"
-      spacing={2}
-    >
-      <Stack direction="column" alignItems="center" justifyContent="center">
-        <Typography variant="h5" component="h3" color="#f00">
-          Cancelacion
-        </Typography>
-        <Typography variant="caption" component="span">
-          porcentaje de cancelacion de reservas
-        </Typography>
-      </Stack>
-      <Stack
-        alignItems="center"
-        justifyContent="center"
-        sx={{
-          fontSize: "1.5rem",
-          bgcolor: "#f00",
-          borderRadius: "50px",
-          height: "70px",
-          width: "70px",
-        }}
-      >
-        <Box component="span">{cancelacion.toFixed(2)}%</Box>
-      </Stack>
-    </Stack>
-  );
-};
-
-export const Descuento = (): JSX.Element => {
-  const [value, setValue] = React.useState<number>(5);
-  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
-
-  const theme = useTheme();
-  const { user } = useAuth();
-
-  return (
-    <Stack
-      direction="column"
-      alignItems="center"
-      justifyContent="space-between"
-      spacing={2}
-    >
-      <Stack direction="column" alignItems="center" justifyContent="center">
-        <Typography
-          variant="h5"
-          component="h3"
-          color={theme.palette.primary.main}
-        >
-          Descuento
-        </Typography>
-        <Typography variant="caption" component="span">
-          ofrecido a clientes habituales
-        </Typography>
-      </Stack>
-      <Stack
-        alignItems="center"
-        justifyContent="center"
-        sx={{
-          fontSize: "1.5rem",
-          bgcolor: theme.palette.primary.main,
-          height: "70px",
-          width: "70px",
-          borderRadius: "50px",
-        }}
-      >
-        {user.rol === "administrador" ? (
-          <>
-            <MuiTooltip title="click para editar">
-              <Box
-                component="span"
-                sx={{ cursor: "pointer" }}
-                onClick={() => setOpenDialog(true)}
-              >
-                {value.toFixed(2)}%
-              </Box>
-            </MuiTooltip>
-            <EditDialog
-              open={openDialog}
-              handleClose={() => setOpenDialog(false)}
-              inputType="number"
-              dialogInfo={{
-                title: "Editar Descuento",
-                name: "descuento",
-                description: `Cambiar descuento para los clientes habituales`,
-                onCancel: () => setOpenDialog(false),
-                onConfirm: (value: number) => {
-                  setValue(value);
-                  setOpenDialog(false);
-                },
-              }}
-            />
-          </>
-        ) : (
-          <Box component="span">{value.toFixed(2)}%</Box>
-        )}
-      </Stack>
-    </Stack>
   );
 };
 

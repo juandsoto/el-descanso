@@ -17,6 +17,7 @@ import {
 import useFilter from "../hooks/useFilter";
 import Filtro from "./Filtro";
 import CheckIcon from "@mui/icons-material/Check";
+import { AnimatePresence, motion } from "framer-motion";
 
 const hardSolicitudes: ISolicitud[] = [
   {
@@ -38,7 +39,7 @@ const hardSolicitudes: ISolicitud[] = [
     nombre: "juan",
     telefono: "123456789",
     correo: "juan@test.com",
-    estado: "atendida",
+    estado: "pendiente",
   },
   {
     id: "4",
@@ -52,7 +53,7 @@ const hardSolicitudes: ISolicitud[] = [
     nombre: "juan",
     telefono: "123456789",
     correo: "juan@test.com",
-    estado: "atendida",
+    estado: "pendiente",
   },
   {
     id: "6",
@@ -66,7 +67,7 @@ const hardSolicitudes: ISolicitud[] = [
     nombre: "juan",
     telefono: "123456789",
     correo: "juan@test.com",
-    estado: "atendida",
+    estado: "pendiente",
   },
   {
     id: "8",
@@ -84,31 +85,23 @@ const hardSolicitudes: ISolicitud[] = [
   },
 ];
 
+const SOLICITUD: ISolicitud = {
+  id: "",
+  nombre: "",
+  telefono: "",
+  correo: "",
+  estado: "",
+};
+
 const Solicitudes = () => {
   const [solicitudes, setSolicitudes] =
     React.useState<ISolicitud[]>(hardSolicitudes);
-  const { filtro, handleChange } = useFilter<EstadoSolicitud>("pendiente");
   const theme = useTheme();
-
-  const solicitudesFiltradas = React.useMemo(() => {
-    return solicitudes.filter(
-      solicitud => solicitud.estado === filtro || filtro === "todas"
-    );
-  }, [filtro, solicitudes]);
 
   const onSetSolicitud = (id: string) => {
     //TODO: enviar solicitud a backend
     const index = solicitudes.findIndex(solicitud => solicitud.id === id);
-    setSolicitudes(prev => {
-      return [
-        ...prev.slice(0, index),
-        {
-          ...prev[index],
-          estado: "atendida",
-        },
-        ...prev.slice(index + 1),
-      ] as ISolicitud[];
-    });
+    setSolicitudes(prev => prev.filter(s => s.id !== id));
   };
 
   return (
@@ -127,17 +120,10 @@ const Solicitudes = () => {
         >
           Solicitudes
         </Typography>
-        <Filtro
-          {...{
-            filtro,
-            handleChange,
-            nombre: "estado",
-            opciones: ["pendiente", "atendida", "todas"],
-          }}
-        />
       </Stack>
       <TableContainer
-        className="hide-scrollbar_xs"
+        // className="hide-scrollbar_xs"
+        className="hide-scrollbar"
         component={Paper}
         sx={{
           width: "100%",
@@ -152,7 +138,7 @@ const Solicitudes = () => {
         >
           <TableHead>
             <TableRow>
-              {Object.keys(solicitudes[0]).map((column, index) => (
+              {Object.keys(SOLICITUD).map((column, index) => (
                 <TableCell
                   key={index}
                   align="center"
@@ -161,34 +147,62 @@ const Solicitudes = () => {
                   {column}
                 </TableCell>
               ))}
-              {filtro !== "atendida" && (
-                <TableCell align="center" sx={{ textTransform: "capitalize" }}>
-                  completar
-                </TableCell>
-              )}
+              <TableCell align="center" sx={{ textTransform: "capitalize" }}>
+                completar
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {solicitudesFiltradas.map((solicitud, index) => (
-              <TableRow
-                key={index}
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                }}
-              >
-                <Solicitud solicitud={solicitud} />
-                {solicitud.estado === "pendiente" && (
-                  <TableCell align="center">
-                    <CheckIcon
-                      fontSize="medium"
-                      htmlColor={theme.palette.primary.main}
-                      onClick={() => onSetSolicitud(solicitud.id)}
-                      sx={{ cursor: "pointer" }}
-                    />
+            <AnimatePresence initial={false}>
+              {!solicitudes.length ? (
+                <TableRow
+                  sx={{
+                    // "&:last-child td, &:last-child th": { border: 0 },
+                    width: "100%",
+                    textAlign: "center",
+                  }}
+                >
+                  <TableCell
+                    align="center"
+                    colSpan={6}
+                    sx={{ color: "error.main" }}
+                  >
+                    No existen solicitudes
                   </TableCell>
-                )}
-              </TableRow>
-            ))}
+                </TableRow>
+              ) : (
+                solicitudes.map(solicitud => (
+                  <TableRow
+                    component={motion.tr}
+                    layout
+                    key={solicitud.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 0.1,
+                      ease: "easeOut",
+                    }}
+                    exit={{ opacity: 0 }}
+                    sx={{
+                      "&:last-child td, &:last-child th": { border: 0 },
+                    }}
+                  >
+                    <Solicitud solicitud={solicitud} />
+                    {solicitud.estado === "pendiente" && (
+                      <TableCell align="center">
+                        <CheckIcon
+                          fontSize="medium"
+                          htmlColor={theme.palette.primary.main}
+                          onClick={() => onSetSolicitud(solicitud.id)}
+                          sx={{ cursor: "pointer" }}
+                        />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              )}
+            </AnimatePresence>
           </TableBody>
         </MuiTable>
       </TableContainer>

@@ -1,4 +1,9 @@
-import { createTheme, PaletteMode, ThemeProvider } from "@mui/material";
+import {
+  createTheme,
+  PaletteMode,
+  ThemeProvider,
+  responsiveFontSizes,
+} from "@mui/material";
 import React from "react";
 
 export const getDesignTokens = (mode: PaletteMode) => ({
@@ -11,9 +16,15 @@ export const getDesignTokens = (mode: PaletteMode) => ({
     ...(mode === "light"
       ? {
           // palette values for light mode
+          secondary: {
+            main: "#9c27b0",
+          },
         }
       : {
           // palette values for dark mode
+          secondary: {
+            main: "#9c27b0",
+          },
         }),
   },
 });
@@ -24,7 +35,10 @@ export const ColorModeContext = React.createContext({
 });
 
 const Theme = ({ children }: any) => {
-  const [mode, setMode] = React.useState<PaletteMode>("light");
+  const [mode, setMode] = React.useState<PaletteMode>(() => {
+    const storedMode = localStorage.getItem("theme");
+    return (storedMode ? storedMode : "light") as PaletteMode;
+  });
   const colorMode = React.useMemo(
     () => ({
       // The dark mode switch would invoke this method
@@ -36,8 +50,11 @@ const Theme = ({ children }: any) => {
     }),
     []
   );
+
+  React.useEffect(() => localStorage.setItem("theme", mode), [mode]);
   // Update the theme only if the mode changes
-  const theme = React.useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+  let theme = React.useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+  theme = responsiveFontSizes(theme);
 
   return (
     <ColorModeContext.Provider value={{ ...colorMode, mode }}>

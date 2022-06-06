@@ -8,21 +8,32 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { IUsuario } from "../interfaces/Usuario";
+import ICliente from "../interfaces/Cliente";
+import React from "react";
 
-interface DialogInfo {
+interface DialogInfo<T> {
   title: string;
+  item: Partial<Omit<T, "password">>;
   description: string;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: (row: Partial<Omit<T, "password">>) => void;
 }
-interface ConfirmDialogProps {
+interface ConfirmDialogProps<T> {
   open: boolean;
   handleClose: () => void;
-  dialogInfo: DialogInfo;
+  dialogInfo: DialogInfo<T>;
 }
 
-const ConfirmDialog = (props: ConfirmDialogProps): JSX.Element => {
+const ConfirmDialog = <T extends Partial<IUsuario & ICliente>>(
+  props: ConfirmDialogProps<T>
+): JSX.Element => {
   const theme = useTheme();
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    props.dialogInfo.onConfirm(props.dialogInfo.item);
+  };
 
   return (
     <Dialog
@@ -38,8 +49,12 @@ const ConfirmDialog = (props: ConfirmDialogProps): JSX.Element => {
           <DialogContentText>{props.dialogInfo.description}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={props.dialogInfo.onCancel}>Cancelar</Button>
-          <Button onClick={props.dialogInfo.onConfirm}>Aceptar</Button>
+          <Box onSubmit={onSubmit} component="form">
+            <Button onClick={props.dialogInfo.onCancel}>Cancelar</Button>
+            <Button type="submit" color="primary">
+              Aceptar
+            </Button>
+          </Box>
         </DialogActions>
       </Box>
     </Dialog>

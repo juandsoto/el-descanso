@@ -46,7 +46,7 @@ const TipoHabitacion = (props: HabitacionProps): JSX.Element => {
           height="140"
           image={props.habitacion.images[0]}
         />
-        <CardContent>
+        <CardContent sx={{ bgcolor: "background.default" }}>
           <Typography
             gutterBottom
             variant="h5"
@@ -59,7 +59,13 @@ const TipoHabitacion = (props: HabitacionProps): JSX.Element => {
             {props.habitacion.description.slice(0, 80)}...
           </Typography>
         </CardContent>
-        <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
+        <CardActions
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            bgcolor: "background.default",
+          }}
+        >
           <Stack direction="row">
             {[0, 0, 0, 0, 0].map((_, index) => (
               <StarRateIcon key={index} sx={{ color: "#ffcd3c" }} />

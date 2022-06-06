@@ -6,7 +6,8 @@ const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   const { images } = props;
   return (
     <Box
-      className="hide-scrollbar"
+      // className="hide-scrollbar_xs"
+      className="hide-scrollbar-x"
       sx={{
         height: "250px",
         display: "flex",

@@ -19,19 +19,25 @@ import { IUsuario } from "../interfaces/Usuario";
 import ICliente from "../interfaces/Cliente";
 
 interface FormProps<T> {
-  editing: T;
+  editing: Omit<T, "password">;
   onConfirm: (row: T) => void;
   width: string;
   handleClose: () => void;
   type: "usuario" | "cliente";
+  creating?: boolean;
 }
 
 const Form = <T extends Partial<IUsuario & ICliente>>(
   props: FormProps<T>
 ): JSX.Element => {
   const { form, handleChange, handleSubmit, handleSelectChange } = useForm<T>(
-    props.editing
+    () => {
+      if (props.type === "usuario")
+        return { ...props.editing, password: "" } as T;
+      return props.editing as T;
+    }
   );
+
   return (
     <Box
       component="form"
@@ -41,6 +47,14 @@ const Form = <T extends Partial<IUsuario & ICliente>>(
       height="100%"
       sx={{ width: props.width, padding: "2rem 1rem" }}
     >
+      <Typography
+        variant="h5"
+        component="h3"
+        color="primary.main"
+        textTransform="capitalize"
+      >
+        {props.creating ? "creando" : "editando"} {props.type}
+      </Typography>
       {props.type === "usuario" && (
         <UsuarioForm
           handleClose={props.handleClose}
@@ -80,13 +94,19 @@ const UsuarioForm = (props: UsuarioFormProps): JSX.Element => {
   const theme = useTheme();
   return (
     <>
-      <Typography
-        variant="h5"
-        component="h3"
-        color={theme.palette.primary.main}
-      >
-        Editando Usuario
-      </Typography>
+      {!props.editing.id && (
+        <TextField
+          margin="normal"
+          fullWidth
+          name="id"
+          label="Identificación"
+          type="text"
+          id="id"
+          autoComplete="id"
+          value={form.id}
+          onChange={handleChange}
+        />
+      )}
       <TextField
         margin="normal"
         fullWidth
@@ -103,20 +123,20 @@ const UsuarioForm = (props: UsuarioFormProps): JSX.Element => {
         fullWidth
         id="usuario"
         label="Usuario"
-        name="usuario"
+        name="username"
         autoComplete="username"
-        value={form.usuario}
+        value={form.username}
         onChange={handleChange}
       />
       <TextField
         margin="normal"
         fullWidth
-        name="contrasena"
+        name="password"
         label="Contraseña"
         type={showPassword ? "text" : "password"}
-        id="contrasena"
+        id="contraseña"
         autoComplete="current-password"
-        value={form.contraseña}
+        value={form.password}
         onChange={handleChange}
         InputProps={{
           endAdornment: (
@@ -182,13 +202,19 @@ const ClienteForm = (props: ClienteFormProps): JSX.Element => {
   const theme = useTheme();
   return (
     <>
-      <Typography
-        variant="h5"
-        component="h3"
-        color={theme.palette.primary.main}
-      >
-        Editando Cliente
-      </Typography>
+      {!props.editing.no_identificacion && (
+        <TextField
+          margin="normal"
+          fullWidth
+          name="no_identificacion"
+          label="Identificación"
+          type="text"
+          id="id"
+          autoComplete="id"
+          value={form.no_identificacion}
+          onChange={handleChange}
+        />
+      )}
       <TextField
         margin="normal"
         fullWidth

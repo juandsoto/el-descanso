@@ -115,7 +115,7 @@ const CustomStepper = () => {
   return (
     <Stack
       direction="column"
-      justifyContent="space-between"
+      justifyContent="start"
       alignItems="stretch"
       sx={{
         width: "100%",
@@ -127,6 +127,14 @@ const CustomStepper = () => {
       }}
       spacing={1}
     >
+      <Typography
+        textAlign="center"
+        color="primary.main"
+        variant="h4"
+        component="h2"
+      >
+        Crear Reservas
+      </Typography>
       <Stepper
         alternativeLabel
         activeStep={activeStep}
@@ -158,7 +166,7 @@ const CustomStepper = () => {
               justifyContent: "space-between",
             }}
           >
-            <Button onClick={handleReset}>Reset</Button>
+            <Button onClick={handleReset}>Nuevo</Button>
           </Box>
         </>
       ) : (

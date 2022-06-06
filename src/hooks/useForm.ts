@@ -1,7 +1,7 @@
 import { SelectChangeEvent } from "@mui/material";
 import React from "react";
 
-const useForm = <T>(initialState: T) => {
+const useForm = <T>(initialState: T | (() => T)) => {
   const [form, setForm] = React.useState<T>(initialState);
 
   const handleSelectChange = (e: SelectChangeEvent) => {

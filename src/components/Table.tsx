@@ -13,6 +13,7 @@ import {
   Stack,
   Checkbox,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { IUsuario } from "../interfaces/Usuario";
 import React from "react";
 import EditDrawer from "./EditDrawer";
@@ -23,48 +24,55 @@ import { useAuth } from "../context/auth";
 import { useReserva } from "../context/reserva/index";
 import IReserva from "../interfaces/Reserva";
 import { useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { formatCurrency } from "../utils/index";
 
 interface TableProps<T> {
   title: string;
-  rows: T[];
-  setRows: (rows: T[]) => void;
+  rows: Omit<T, "password">[];
+  // setRows: (rows: T[]) => void;
   type: "usuario" | "cliente";
   fullWidth?: boolean;
-  initialSelected: T;
+  initialSelected: Omit<T, "password">;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   onChangeSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCreate: (item: T) => void;
+  onUpdate: (item: Partial<T>) => void;
+  onDelete: (id: string) => void;
 }
 
 const CLIENTE: ICliente = {
-  id: "",
+  no_identificacion: "",
   nombre: "",
   telefono: "",
   correo: "",
 };
 
-const USUARIO: IUsuario = {
+const USUARIO: Omit<IUsuario, "password"> = {
   id: "",
-  nombre: "",
-  usuario: "",
-  telefono: "",
-  contraseña: "",
   rol: "",
+  nombre: "",
+  username: "",
+  telefono: "",
 };
 
-const Table = <T extends Partial<IUsuario & ICliente>>(
+const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
   props: TableProps<T>
 ): JSX.Element => {
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
+  const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
-  const [selected, setSelected] = React.useState<T>(props.initialSelected);
+  const [selected, setSelected] = React.useState<Omit<T, "password">>(
+    props.initialSelected
+  );
   const { user } = useAuth();
   const theme = useTheme();
   const location = useLocation();
 
   const inAdminPanel = location.pathname.split("/")[2] === "administrador";
 
-  let SUBJECT: ICliente | IUsuario =
+  let SUBJECT: ICliente | Omit<IUsuario, "password"> =
     props.type === "usuario" ? USUARIO : CLIENTE;
 
   return (
@@ -86,14 +94,30 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
           alignItems="end"
           justifyContent="space-between"
         >
-          <Typography
-            variant="h4"
-            component="h2"
-            color="primary.main"
-            fontSize={{ xs: "1.5rem", sm: "2rem" }}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            alignItems="center"
+            spacing={{ xs: 1, sm: 4 }}
           >
-            {props.title}
-          </Typography>
+            <Typography
+              variant="h4"
+              component="h2"
+              color="primary.main"
+              fontSize={{ xs: "1.5rem", sm: "2rem" }}
+            >
+              {props.title}
+            </Typography>
+            <Button
+              onClick={() => {
+                setIsCreating(true);
+              }}
+              variant="outlined"
+              color="primary"
+              startIcon={<AddIcon />}
+            >
+              Agregar
+            </Button>
+          </Stack>
           <TextField
             id="standard-basic"
             label="Buscar..."
@@ -103,7 +127,8 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
           />
         </Stack>
         <TableContainer
-          className="hide-scrollbar_xs"
+          // className="hide-scrollbar_xs"
+          className="hide-scrollbar"
           component={Paper}
           sx={{
             width: `${props.fullWidth ? "100%" : "80%"}`,
@@ -123,6 +148,7 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
                     key={index}
                     align="center"
                     sx={{ textTransform: "capitalize" }}
+                    colSpan={index === 2 ? 2 : 1}
                   >
                     {column}
                   </TableCell>
@@ -139,58 +165,106 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.rows.map((row, index) => {
-                return (
+              <AnimatePresence initial={false}>
+                {!props.rows.length ? (
                   <TableRow
-                    key={index}
                     sx={{
-                      "&:last-child td, &:last-child th": { border: 0 },
+                      // "&:last-child td, &:last-child th": { border: 0 },
+                      width: "100%",
+                      textAlign: "center",
                     }}
                   >
-                    {Object.values(row).map((cell: string, index) => {
-                      return (
-                        <TableCell align="center" key={index}>
-                          {cell}
-                        </TableCell>
-                      );
-                    })}
-                    {!inAdminPanel && (
-                      <TableCell align="center">
-                        <CheckCliente cliente={row as ICliente} />
-                      </TableCell>
-                    )}
-                    {inAdminPanel && (
-                      <>
-                        <TableCell align="center">
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={() => {
-                              setSelected(row);
-                              setIsEditing(true);
-                            }}
-                          >
-                            editar
-                          </Button>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => setIsDeleting(true)}
-                          >
-                            eliminar
-                          </Button>
-                        </TableCell>
-                      </>
-                    )}
+                    <TableCell
+                      align="center"
+                      colSpan={8}
+                      sx={{ color: "error.main" }}
+                    >
+                      No existen {props.type}s
+                    </TableCell>
                   </TableRow>
-                );
-              })}
+                ) : (
+                  props.rows.map((row, index) => {
+                    return (
+                      <TableRow
+                        key={`${props.type} ${index}`}
+                        component={motion.tr}
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{
+                          duration: 0.3,
+                          ease: "easeOut",
+                        }}
+                        exit={{ opacity: 0 }}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        {Object.values(row).map((value: any, index) => {
+                          return (
+                            <TableCell
+                              align="center"
+                              key={index}
+                              colSpan={index === 2 ? 2 : 1}
+                            >
+                              {value}
+                            </TableCell>
+                          );
+                        })}
+                        {!inAdminPanel && (
+                          <TableCell align="center">
+                            <CheckCliente cliente={row as ICliente} />
+                          </TableCell>
+                        )}
+                        {inAdminPanel && (
+                          <>
+                            <TableCell align="center">
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={() => {
+                                  setSelected(row);
+                                  setIsEditing(true);
+                                }}
+                              >
+                                editar
+                              </Button>
+                            </TableCell>
+                            <TableCell align="center">
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={() => {
+                                  setSelected(row);
+                                  setIsDeleting(true);
+                                }}
+                              >
+                                eliminar
+                              </Button>
+                            </TableCell>
+                          </>
+                        )}
+                      </TableRow>
+                    );
+                  })
+                )}
+              </AnimatePresence>
             </TableBody>
           </MuiTable>
         </TableContainer>
       </Box>
+      <EditDrawer
+        handleClose={() => setIsCreating(false)}
+        open={isCreating}
+        editing={(props.type === "usuario" ? USUARIO : CLIENTE) as T}
+        type={props.type}
+        creating
+        onConfirm={(row: T) => {
+          setIsCreating(false);
+          props.onCreate(row);
+          // props.setRows([row, ...props.rows]);
+        }}
+      />
       {inAdminPanel && (
         <>
           <EditDrawer
@@ -199,7 +273,10 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
             editing={selected}
             type={props.type}
             onConfirm={(row: T) => {
-              props.setRows(props.rows.map(r => (r.id === row.id ? row : r)));
+              setIsEditing(false);
+              props.onUpdate(row);
+
+              // props.setRows(props.rows.map(r => (r.id === row.id ? row : r)));
             }}
           />
           <ConfirmDialog
@@ -208,10 +285,13 @@ const Table = <T extends Partial<IUsuario & ICliente>>(
             dialogInfo={{
               title: `Eliminar ${props.type}`,
               description: `¿Está seguro que desea eliminar este ${props.type}?`,
+              item: selected,
               onCancel: () => setIsDeleting(false),
-              onConfirm: () => {
-                alert("eliminado satisfactoriamente");
+              onConfirm: (row: Partial<Omit<T, "password">>) => {
                 setIsDeleting(false);
+                props.onDelete(row.id ?? "");
+
+                // props.setRows(props.rows.filter(r => r.id !== row.id));
               },
             }}
           />
@@ -238,10 +318,16 @@ const CheckCliente = (props: CheckClienteProps): JSX.Element => {
   return (
     <Checkbox
       disabled={
-        !reserva.cliente ? false : reserva.cliente.id !== props.cliente.id
+        !reserva.cliente
+          ? false
+          : reserva.cliente.no_identificacion !==
+            props.cliente.no_identificacion
       }
       checked={
-        !reserva.cliente ? false : reserva.cliente.id === props.cliente.id
+        !reserva.cliente
+          ? false
+          : reserva.cliente.no_identificacion ===
+            props.cliente.no_identificacion
       }
       onChange={onChange}
       inputProps={{ "aria-label": "controlled" }}

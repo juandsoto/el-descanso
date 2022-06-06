@@ -4,11 +4,12 @@ import { IUsuario } from "../interfaces/Usuario";
 import Form from "./Form";
 
 interface EditDrawerProps<T> {
-  editing: T;
+  editing: Omit<T, "password">;
   open: boolean;
   type: "usuario" | "cliente";
   handleClose: () => void;
   onConfirm: (row: T) => void;
+  creating?: boolean;
 }
 
 const EditDrawer = <T extends Partial<IUsuario & ICliente>>(
@@ -21,6 +22,7 @@ const EditDrawer = <T extends Partial<IUsuario & ICliente>>(
     <Drawer anchor="right" open={props.open} onClose={props.handleClose}>
       <Form
         type={props.type}
+        creating={props.creating}
         onConfirm={props.onConfirm}
         width={isSmallScreen ? "80vw" : "30vw"}
         editing={props.editing}

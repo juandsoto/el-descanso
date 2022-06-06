@@ -20,4 +20,4 @@ export { default as Clientes } from "./Clientes";
 export { default as Solicitudes } from "./Solicitudes";
 export { default as Habitaciones } from "./Habitaciones";
 export { default as ReservaModal } from "./ReservaModal";
-export { Descuento } from "./Estadisticas";
+export { default as Descuento } from "./Descuento";

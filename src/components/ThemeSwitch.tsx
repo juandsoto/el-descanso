@@ -14,7 +14,12 @@ const ThemeSwitch = (): JSX.Element => {
       ) : (
         <DarkModeIcon htmlColor="#1D1D1D" />
       )}
-      <Switch color="primary" onClick={toggleColorMode} />
+      <Switch
+        checked={mode === "dark"}
+        color="primary"
+        onChange={toggleColorMode}
+        inputProps={{ "aria-label": "controlled" }}
+      />
     </Box>
   );
 };

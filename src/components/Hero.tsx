@@ -134,13 +134,16 @@ const BigDevice = (props: { theme: Theme }): JSX.Element => {
           ¡Reserva ya!
         </Link>
       </Grid>
-      <Grid item sm={12} md={8} zIndex={3}>
+      <Grid item sm={12} md={8}>
         <img
           src={hero}
           alt="hero"
           width="100%"
           height="100%"
-          style={{ borderRadius: "20px", boxShadow: "0px 0px 10px #000" }}
+          style={{
+            borderRadius: "20px",
+            boxShadow: "0px 0px 10px #000",
+          }}
         />
       </Grid>
     </Grid>

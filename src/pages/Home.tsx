@@ -13,7 +13,7 @@ const Home = (): JSX.Element => {
 
   return (
     <Stack
-      spacing={3}
+      spacing={10}
       sx={{
         bgcolor: theme.palette.background.default,
       }}
@@ -25,7 +25,6 @@ const Home = (): JSX.Element => {
       <Box id="habitaciones" px={2}>
         <ListaTipoHabitacion />
       </Box>
-
       <Box id="servicios">
         <Servicios bgImage />
       </Box>
@@ -46,6 +45,7 @@ const Home = (): JSX.Element => {
           padding: "4px 12px",
           borderRadius: "20px",
           bgcolor: theme.palette.background.default,
+          zIndex: 99,
         }}
       >
         <ThemeSwitch />

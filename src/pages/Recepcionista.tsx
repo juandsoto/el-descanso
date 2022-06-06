@@ -7,18 +7,18 @@ import {
   Solicitudes,
   Descuento,
 } from "../components";
-import Checkin from "../components/ConsultarReserva";
+import ConsultarReserva from "../components/ConsultarReserva";
 import CustomStepper from "../components/CustomStepper";
 
 const Recepcionista = (): JSX.Element => {
-  const [openReservaModal, setOpenReservaModal] =
-    React.useState<boolean>(false);
-
   return (
     <UserLayout>
       <UserLayoutLeft />
       <UserLayoutRight username="Recepcionista">
         <Grid container spacing={2}>
+          <Grid item xs={12} md={9}>
+            <Solicitudes />
+          </Grid>
           <Grid
             item
             xs={12}
@@ -26,17 +26,17 @@ const Recepcionista = (): JSX.Element => {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            textAlign="center"
+            flexWrap="wrap"
           >
-            <Descuento />
+            <Descuento type="persona natural" />
+            <Descuento type="cliente corporativo" />
           </Grid>
-          <Grid item xs={12} md={9}>
-            <Solicitudes />
+          <Grid item xs={12} sx={{ mt: 4 }}>
+            <ConsultarReserva />
           </Grid>
-          <Grid item xs={12} sx={{ minHeight: "80vh" }}>
+          <Grid item xs={12} sx={{ mt: 4, minHeight: "80vh" }}>
             <CustomStepper />
-          </Grid>
-          <Grid item xs={12}>
-            <Checkin />
           </Grid>
         </Grid>
       </UserLayoutRight>

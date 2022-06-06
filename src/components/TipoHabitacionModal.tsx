@@ -49,10 +49,14 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
     transform: "translate(-50%, -50%)",
     width: { xs: "90%", sm: "60%" },
     minHeight: { xs: "80%", sm: "70%" },
+    maxHeight: "95%",
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: "10px",
+    overflowY: "scroll",
     p: 4,
+    display: "flex",
+    flexDirection: "column",
   };
 
   const serviceIcon = (name: string) => {
@@ -84,48 +88,56 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
         BackdropProps={{
           timeout: 500,
         }}
-        sx={{ color: theme.palette.text.primary }}
+        sx={{
+          color: theme.palette.text.primary,
+        }}
       >
         <Fade in={open}>
-          <Box sx={style}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Typography
-                textTransform="capitalize"
-                id={`modal-${habitacion.nombre}`}
-                variant="h6"
-                component="h2"
+          <Box
+            // className="hide-scrollbar-y_xs"
+            className="hide-scrollbar-y"
+            sx={style}
+          >
+            <Box sx={{ flex: 1 }}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                {habitacion.nombre}
-              </Typography>
-              <Box display="flex">
-                {[0, 0, 0, 0, 0].map((star, index) => (
-                  <StarRateIcon key={index} sx={{ color: "#ffcd3c" }} />
-                ))}
+                <Typography
+                  textTransform="capitalize"
+                  id={`modal-${habitacion.nombre}`}
+                  variant="h6"
+                  component="h2"
+                >
+                  {habitacion.nombre}
+                </Typography>
+                <Box display="flex">
+                  {[0, 0, 0, 0, 0].map((star, index) => (
+                    <StarRateIcon key={index} sx={{ color: "#ffcd3c" }} />
+                  ))}
+                </Box>
               </Box>
-            </Box>
-            <Divider variant="fullWidth" />
-            <Typography id={`modal-${habitacion.description}`} sx={{ mt: 2 }}>
-              {habitacion.description}
-            </Typography>
-            <ImageSlider images={habitacion.images} />
-            <Box>
-              <List>
-                {habitacion.services.map(service => (
-                  <ListItem key={service}>
-                    <ListItemIcon>{serviceIcon(service)}</ListItemIcon>
-                    <ListItemText
-                      sx={{
-                        textTransform: "capitalize",
-                      }}
-                      primary={service}
-                    />
-                  </ListItem>
-                ))}
-              </List>
+              <Divider variant="fullWidth" />
+              <Typography id={`modal-${habitacion.description}`} sx={{ mt: 2 }}>
+                {habitacion.description}
+              </Typography>
+              <ImageSlider images={habitacion.images} />
+              <Box>
+                <List>
+                  {habitacion.services.map(service => (
+                    <ListItem key={service}>
+                      <ListItemIcon>{serviceIcon(service)}</ListItemIcon>
+                      <ListItemText
+                        sx={{
+                          textTransform: "capitalize",
+                        }}
+                        primary={service}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
             </Box>
             <Stack
               direction={{ xs: "column", sm: "row" }}

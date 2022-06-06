@@ -15,10 +15,14 @@ const ListaTipoHabitacion = (): JSX.Element => {
         Tipos de habitaciones
       </Typography>
       <Stack
-        className="hide-scrollbar"
+        // className="hide-scrollbar-x_xs"
+        className="hide-scrollbar-x"
         direction="row"
         gap={1}
-        sx={{ overflowX: "scroll", cursor: "grab" }}
+        sx={{
+          overflowX: "scroll",
+          // cursor: "grab",
+        }}
         py={2}
       >
         {tipoHabitaciones.map((habitacion, index) => {

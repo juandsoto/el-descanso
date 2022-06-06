@@ -29,7 +29,6 @@ const Admin = () => {
           <ListaTipoHabitacion />
           <Habitaciones />
           <Servicios fullWidth />
-          Reservas
           <Usuarios />
           <Clientes />
         </Box>

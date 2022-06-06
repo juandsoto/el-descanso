@@ -7,4 +7,7 @@ import shimReactPdf from "vite-plugin-shim-react-pdf";
 export default defineConfig({
   base: "/el-descanso/",
   plugins: [react(), reactRefresh(), shimReactPdf()],
+  define: {
+    global: {},
+  },
 });

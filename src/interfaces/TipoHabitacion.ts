@@ -7,9 +7,9 @@ export type NombreTipoHabitacion =
   | "todas";
 
 export default interface ITipoHabitacion {
-  nombre: Omit<NombreTipoHabitacion, "todas">;
+  tipo: Omit<NombreTipoHabitacion, "todas">;
   images: string[];
-  description: string;
+  descripcion: string;
   precio: number;
-  services: string[];
+  servicios: string[];
 }

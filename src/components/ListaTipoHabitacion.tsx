@@ -1,8 +1,24 @@
+import React from "react";
 import { Typography, useTheme, Stack } from "@mui/material";
 import { tipoHabitaciones } from "../data";
 import TipoHabitacion from "./TipoHabitacion";
+import useAxios from "../hooks/useAxios";
+import ITipoHabitacion from "../interfaces/TipoHabitacion";
 
 const ListaTipoHabitacion = (): JSX.Element => {
+  const [{ data }] = useAxios<ITipoHabitacion[]>("/tipohabitaciones/");
+
+  const habitaciones = React.useMemo(
+    () =>
+      data?.map(h => ({
+        ...h,
+        images: tipoHabitaciones.find(th => th.tipo === h.tipo)?.images || [],
+        servicios:
+          tipoHabitaciones.find(th => th.tipo === h.tipo)?.servicios || [],
+      })),
+    [data]
+  );
+
   const theme = useTheme();
   return (
     <Stack direction="row" flexDirection="column" justifyContent="start">
@@ -25,7 +41,7 @@ const ListaTipoHabitacion = (): JSX.Element => {
         }}
         py={2}
       >
-        {tipoHabitaciones.map((habitacion, index) => {
+        {habitaciones?.map((habitacion, index) => {
           return (
             <TipoHabitacion
               key={index}

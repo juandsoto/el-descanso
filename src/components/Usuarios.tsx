@@ -5,6 +5,7 @@ import useAxios from "../hooks/useAxios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/auth/index";
 import useUsuarios from "../hooks/useUsuarios";
+import { useAppContext } from "../context/index";
 
 const initialSelected: IUsuario = {
   id: "",
@@ -18,7 +19,6 @@ const initialSelected: IUsuario = {
 const Usuarios = (): JSX.Element => {
   const { usuarios, createUser, updateUser, deleteUser } = useUsuarios();
   const [search, setSearch] = React.useState<string>("");
-
   const filtroUsuarios = React.useMemo(
     () =>
       usuarios?.filter(usuario => {
@@ -48,7 +48,6 @@ const Usuarios = (): JSX.Element => {
       type="usuario"
       fullWidth
       rows={filtroUsuarios ?? []}
-      // setRows={setUsuarios}
       search={search}
       setSearch={setSearch}
       onChangeSearch={onChangeSearch}

@@ -23,7 +23,10 @@ const TerminarReserva = () => {
   const precioTotal = React.useCallback<() => number>(
     () =>
       reserva.habitaciones.reduce((acc, habitacion) => {
-        const { precio, numero_noches } = habitacion!;
+        const {
+          tipo: { precio },
+          numero_noches,
+        } = habitacion!;
         const value: number =
           !!precio && !!numero_noches ? precio * numero_noches : 0;
         return acc + value;
@@ -64,7 +67,7 @@ const TerminarReserva = () => {
             {Object.entries(reserva.cliente || {}).map(([key, value]) => {
               return (
                 <Box key={key}>
-                  {key} - {value}
+                  {key.toUpperCase()}: {value}
                 </Box>
               );
             })}
@@ -169,8 +172,8 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
       >
         <Typography component="span" textTransform="capitalize" flex={1}>
           {`no: ${props.habitacion.no_habitacion} - ${
-            props.habitacion.tipo
-          } - ${formatCurrency(props.habitacion.precio || 0)}`}
+            props.habitacion.tipo.tipo
+          } - ${formatCurrency(props.habitacion.tipo.precio || 0)}`}
         </Typography>
         <Stack direction="row" spacing={1} alignItems="center">
           <TextField
@@ -200,7 +203,7 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
           />
           <Typography>
             {formatCurrency(
-              (props.habitacion.precio || 0) *
+              (props.habitacion.tipo.precio || 0) *
                 (props.habitacion.numero_noches ?? 1)
             )}
           </Typography>

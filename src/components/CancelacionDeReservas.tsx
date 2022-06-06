@@ -1,12 +1,21 @@
 import React from "react";
 import { Stack, Box, Typography } from "@mui/material";
+import useAxios from "../hooks/useAxios";
+import { useAuth } from "../context/auth/index";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const CancelacionDeReservas = () => {
-  const [cancelacion, setCancelacion] = React.useState(0);
+  const { user } = useAuth();
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${user.token}`,
+  };
+  const [{ data: cancelacion, loading, error }] = useAxios<{
+    porcentaje_cancelacion: number;
+  }>({
+    url: "/porcentajecancelacion/",
+    headers,
+  });
 
-  React.useEffect(() => {
-    setCancelacion(3);
-  }, []);
   return (
     <Stack
       direction="column"
@@ -15,7 +24,7 @@ const CancelacionDeReservas = () => {
       spacing={2}
     >
       <Stack direction="column" alignItems="center" justifyContent="center">
-        <Typography variant="h5" component="h3" color="#f00">
+        <Typography variant="h5" component="h3" color="error.main">
           Cancelacion
         </Typography>
         <Typography textAlign="center" variant="caption" component="span">
@@ -27,13 +36,19 @@ const CancelacionDeReservas = () => {
         justifyContent="center"
         sx={{
           fontSize: "1.5rem",
-          bgcolor: "#f00",
+          bgcolor: loading ? "transparent" : "error.main",
           borderRadius: "50px",
           height: "70px",
           width: "70px",
         }}
       >
-        <Box component="span">{cancelacion.toFixed(2)}%</Box>
+        {loading ? (
+          <CircularProgress color="error" />
+        ) : (
+          <Box component="span">
+            {cancelacion?.porcentaje_cancelacion.toFixed(2)}%
+          </Box>
+        )}
       </Stack>
     </Stack>
   );

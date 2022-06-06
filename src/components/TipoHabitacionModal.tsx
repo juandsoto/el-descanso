@@ -79,8 +79,8 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
   return (
     <Box>
       <Modal
-        aria-labelledby={`modal-${habitacion.nombre}`}
-        aria-describedby={`modal-${habitacion.description}`}
+        aria-labelledby={`modal-${habitacion.tipo}`}
+        aria-describedby={`modal-${habitacion.descripcion}`}
         open={open}
         onClose={handleClose}
         closeAfterTransition
@@ -106,11 +106,11 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
               >
                 <Typography
                   textTransform="capitalize"
-                  id={`modal-${habitacion.nombre}`}
+                  id={`modal-${habitacion.tipo}`}
                   variant="h6"
                   component="h2"
                 >
-                  {habitacion.nombre}
+                  {habitacion.tipo}
                 </Typography>
                 <Box display="flex">
                   {[0, 0, 0, 0, 0].map((star, index) => (
@@ -119,13 +119,13 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                 </Box>
               </Box>
               <Divider variant="fullWidth" />
-              <Typography id={`modal-${habitacion.description}`} sx={{ mt: 2 }}>
-                {habitacion.description}
+              <Typography id={`modal-${habitacion.descripcion}`} sx={{ mt: 2 }}>
+                {habitacion.descripcion}
               </Typography>
               <ImageSlider images={habitacion.images} />
               <Box>
                 <List>
-                  {habitacion.services.map(service => (
+                  {habitacion.servicios.map(service => (
                     <ListItem key={service}>
                       <ListItemIcon>{serviceIcon(service)}</ListItemIcon>
                       <ListItemText
@@ -184,7 +184,7 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                     dialogInfo={{
                       title: "Editar Precio",
                       name: "precio",
-                      description: `Cambiar precio de la habitacion ${habitacion.nombre}`,
+                      description: `Cambiar precio de la habitacion ${habitacion.tipo}`,
                       onCancel: () => setOpenDialog(false),
                       onConfirm: (value: number) => {
                         setPrecio(value);

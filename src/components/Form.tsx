@@ -97,6 +97,7 @@ const UsuarioForm = (props: UsuarioFormProps): JSX.Element => {
       {!props.editing.id && (
         <TextField
           margin="normal"
+          autoFocus
           fullWidth
           name="id"
           label="Identificación"
@@ -207,6 +208,7 @@ const ClienteForm = (props: ClienteFormProps): JSX.Element => {
           margin="normal"
           fullWidth
           name="no_identificacion"
+          autoFocus
           label="Identificación"
           type="text"
           id="id"

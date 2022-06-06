@@ -171,12 +171,15 @@ const CustomStepper = () => {
         </>
       ) : (
         <>
-          <Box sx={{ flex: 1 }}>
-            {activeStep === 0 && <Clientes />}
-            {activeStep === 1 && <Habitaciones />}
-            {activeStep === 2 && <TerminarReserva />}
+          <Box sx={{ flex: 1, display: activeStep === 0 ? "block" : "none" }}>
+            <Clientes />
           </Box>
-
+          <Box sx={{ flex: 1, display: activeStep === 1 ? "block" : "none" }}>
+            <Habitaciones />
+          </Box>
+          <Box sx={{ flex: 1, display: activeStep === 2 ? "block" : "none" }}>
+            <TerminarReserva />
+          </Box>
           <Box
             sx={{
               display: "flex",

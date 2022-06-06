@@ -3,10 +3,14 @@ import useAxios from "../hooks/useAxios";
 import toast from "react-hot-toast";
 import { IUsuario } from "../interfaces/Usuario";
 import { useAuth } from "../context/auth/index";
+import { useAppContext } from "../context/index";
 
 const useUsuarios = () => {
   const [state, setState] = React.useState<Omit<IUsuario, "password">[]>();
   const { user } = useAuth();
+  const {
+    backdrop: { openBackdrop, closeBackdrop },
+  } = useAppContext();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${user.token}`,
   };
@@ -52,6 +56,7 @@ const useUsuarios = () => {
     { manual: true }
   );
   const createUser = (user: IUsuario) => {
+    openBackdrop();
     postUser({
       data: user,
     });
@@ -75,6 +80,7 @@ const useUsuarios = () => {
 
   React.useEffect(() => {
     if (!postResponse) return;
+    closeBackdrop();
     toast.success(postResponse.detail);
     setState(prev => [
       {

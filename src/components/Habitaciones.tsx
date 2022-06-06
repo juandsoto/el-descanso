@@ -33,12 +33,17 @@ import EditDrawer from "./EditDrawer";
 import { useAuth } from "../context/auth/index";
 import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import { formatCurrency } from "../utils";
+import ITipoHabitacion from "../interfaces/TipoHabitacion";
+import useHabitaciones from "../hooks/useHabitaciones";
 
 interface HabitacionesProps {}
 
 const Habitaciones = (props: HabitacionesProps): JSX.Element => {
+  const location = useLocation();
+  const inAdminPanel = location.pathname.split("/")[2] === "administrador";
+
   const { filtro: filtroEstado, handleChange: handleChangeEstado } =
-    useFilter<EstadoHabitacion>("disponible");
+    useFilter<EstadoHabitacion>(inAdminPanel ? "todas" : "disponible");
   const { filtro: filtroTipo, handleChange: handleChangeTipo } =
     useFilter<NombreTipoHabitacion>("todas");
   const [nuevaHabitacion, setNuevaHabitacion] = React.useState<
@@ -46,54 +51,24 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
   >("");
   const theme = useTheme();
   const { user } = useAuth();
-
-  const [habitaciones, setHabitaciones] =
-    React.useState<IHabitacion[]>(hardHabitaciones);
+  const { habitaciones, createHabitacion } = useHabitaciones();
 
   const [deleting, setDeleting] = React.useState<IHabitacion | null>();
 
-  const location = useLocation();
-
-  const inAdminPanel = location.pathname.split("/")[2] === "administrador";
-
   const habitacionesFiltradas = React.useMemo(
     () =>
-      habitaciones.filter(habitacion => {
+      habitaciones?.filter(habitacion => {
         const filtroPorEstado =
           habitacion.estado === filtroEstado || filtroEstado === "todas";
         const filtroPorTipo =
-          habitacion.tipo === filtroTipo || filtroTipo === "todas";
+          habitacion.tipo.tipo === filtroTipo || filtroTipo === "todas";
         return filtroPorEstado && filtroPorTipo;
       }),
     [habitaciones, filtroEstado, filtroTipo]
   );
 
-  const animation = useAnimation();
-
-  const list = {
-    hidden: { opacity: 1 },
-    visible: {
-      transition: {
-        staggerChildren: "infinite",
-      },
-    },
-  };
-  const item = {
-    hidden: { x: -60, opacity: 0 },
-    visible: { x: 0, opacity: 1 },
-  };
-
   const onNuevaHabitacion = (tipo: Exclude<NombreTipoHabitacion, "todas">) => {
-    setNuevaHabitacion(tipo);
-    setHabitaciones(prev => [
-      {
-        no_habitacion: Math.max(...habitaciones.map(h => h.no_habitacion)) + 1,
-        estado: "disponible",
-        tipo: tipo,
-        precio: 999999,
-      },
-      ...prev,
-    ]);
+    createHabitacion(tipo);
   };
 
   return (
@@ -132,11 +107,7 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
                 labelId="filter-select"
                 id="filter-select-id"
                 value={nuevaHabitacion}
-                onChange={e =>
-                  onNuevaHabitacion(
-                    e.target.value as Exclude<NombreTipoHabitacion, "todas">
-                  )
-                }
+                onChange={e => onNuevaHabitacion(e.target.value as any)}
                 autoWidth
                 label="Agregar"
               >
@@ -185,7 +156,7 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
         </Stack>
       </Stack>
       <TableContainer
-        className="hide-scrollbar-y"
+        className="hide-scrollbar"
         component={Paper}
         sx={{
           width: "100%",
@@ -200,15 +171,17 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
         >
           <TableHead>
             <TableRow>
-              {Object.keys(habitaciones[0]).map((column, index) => (
-                <TableCell
-                  key={index}
-                  align="center"
-                  sx={{ textTransform: "capitalize" }}
-                >
-                  {column}
-                </TableCell>
-              ))}
+              {["no_habitacion", "tipo", "estado", "precio"].map(
+                (column, index) => (
+                  <TableCell
+                    key={index}
+                    align="center"
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    {column}
+                  </TableCell>
+                )
+              )}
               {!inAdminPanel && (
                 <TableCell align="center">Seleccionar</TableCell>
               )}
@@ -217,7 +190,7 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
           </TableHead>
           <TableBody component={motion.tbody}>
             <AnimatePresence initial={false}>
-              {!habitacionesFiltradas.length ? (
+              {!habitacionesFiltradas?.length ? (
                 <TableRow
                   sx={{
                     // "&:last-child td, &:last-child th": { border: 0 },
@@ -252,19 +225,16 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
                         "&:last-child td, &:last-child th": { border: 0 },
                       }}
                     >
-                      {Object.entries(habitacion).map(
-                        ([key, value]: any, index) => {
-                          return (
-                            <TableCell
-                              // component={motion.td}
-                              align="center"
-                              key={index}
-                            >
-                              {key !== "precio" ? value : formatCurrency(value)}
-                            </TableCell>
-                          );
-                        }
-                      )}
+                      <TableCell align="center">
+                        {habitacion.no_habitacion}
+                      </TableCell>
+                      <TableCell align="center">
+                        {habitacion.tipo.tipo}
+                      </TableCell>
+                      <TableCell align="center">{habitacion.estado}</TableCell>
+                      <TableCell align="center">
+                        {formatCurrency(habitacion.tipo.precio)}
+                      </TableCell>
                       {!inAdminPanel && (
                         <TableCell align="center">
                           <CheckHabitacion habitacion={habitacion} />
@@ -295,15 +265,16 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
           handleClose={() => setDeleting(null)}
           dialogInfo={{
             title: `Eliminar habitación no.${deleting?.no_habitacion}`,
+            // item: deleting,
             description: `¿Está seguro que desea eliminar esta habitación?`,
             onCancel: () => setDeleting(null),
             onConfirm: () => {
-              setHabitaciones(prev =>
-                prev.filter(
-                  habitacion =>
-                    habitacion.no_habitacion !== deleting!.no_habitacion
-                )
-              );
+              // setHabitaciones(prev =>
+              //   prev.filter(
+              //     habitacion =>
+              //       habitacion.no_habitacion !== deleting!.no_habitacion
+              //   )
+              // );
               setDeleting(null);
             },
           }}

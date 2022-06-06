@@ -42,7 +42,6 @@ const TipoHabitacion = (props: HabitacionProps): JSX.Element => {
       >
         <CardMedia
           component="img"
-          alt={props.habitacion.nombre}
           height="140"
           image={props.habitacion.images[0]}
         />
@@ -53,10 +52,10 @@ const TipoHabitacion = (props: HabitacionProps): JSX.Element => {
             component="div"
             textTransform="capitalize"
           >
-            {props.habitacion.nombre}
+            {props.habitacion.tipo}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {props.habitacion.description.slice(0, 80)}...
+            {props.habitacion.descripcion.slice(0, 40)}...
           </Typography>
         </CardContent>
         <CardActions

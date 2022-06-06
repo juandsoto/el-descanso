@@ -1,5 +1,6 @@
 import { Toaster } from "react-hot-toast";
 import "./App.css";
+import Backdrop from "./components/Backdrop";
 import Navigator from "./routes/index";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
         reverseOrder={false}
         toastOptions={{ duration: 3500 }}
       />
+      <Backdrop />
       <Navigator />
     </>
   );

@@ -39,43 +39,34 @@ ChartJS.register(
 export const nombreTipoHabitaciones: Exclude<NombreTipoHabitacion, "todas">[] =
   ["sencilla", "doble", "matrimonial", "suite sencilla", "suite presidencial"];
 
-export const tipoHabitaciones: ITipoHabitacion[] = [
+export const tipoHabitaciones: Pick<
+  ITipoHabitacion,
+  "tipo" | "images" | "servicios"
+>[] = [
   {
-    nombre: "sencilla",
+    tipo: "sencilla",
     images: [SencillaImage, DobleImage, MatrimonialImage],
-    description:
-      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    precio: 199900,
-    services: ["restaurante"],
+    servicios: ["restaurante"],
   },
   {
-    nombre: "doble",
+    tipo: "doble",
     images: [DobleImage, MatrimonialImage, SuiteSencillaImage],
-    description:
-      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    precio: 199900,
-    services: ["restaurante", "llamadas de larga distancia"],
+    servicios: ["restaurante", "llamadas de larga distancia"],
   },
   {
-    nombre: "matrimonial",
+    tipo: "matrimonial",
     images: [MatrimonialImage, SuiteSencillaImage, SuitePresidencialImage],
-    description:
-      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    precio: 199900,
-    services: ["restaurante", "llamadas de larga distancia", "lavado"],
+    servicios: ["restaurante", "llamadas de larga distancia", "lavado"],
   },
   {
-    nombre: "suite sencilla",
+    tipo: "suite sencilla",
     images: [
       SuiteSencillaImage,
       SuitePresidencialImage,
       SencillaImage,
       "https://images.unsplash.com/photo-1616046229478-9901c5536a45?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80",
     ],
-    description:
-      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    precio: 199900,
-    services: [
+    servicios: [
       "restaurante",
       "llamadas de larga distancia",
       "lavado",
@@ -83,12 +74,9 @@ export const tipoHabitaciones: ITipoHabitacion[] = [
     ],
   },
   {
-    nombre: "suite presidencial",
+    tipo: "suite presidencial",
     images: [SuitePresidencialImage, SencillaImage, DobleImage],
-    description:
-      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum rerum tenetur quam ab iusto itaque in, enim a! Officiis, nisi!",
-    precio: 199900,
-    services: [
+    servicios: [
       "restaurante",
       "llamadas de larga distancia",
       "lavado",
@@ -386,7 +374,7 @@ export const hardReservas: IReserva[] = [
     fecha_entrada: new Date(),
     numero_noches: 3,
     cliente: {
-      id: "1",
+      no_identificacion: "1",
       nombre: "juan",
       correo: "juan@test.com",
       telefono: "123456789",
@@ -403,7 +391,7 @@ export const hardReservas: IReserva[] = [
     fecha_entrada: new Date(),
     numero_noches: 1,
     cliente: {
-      id: "1",
+      no_identificacion: "1",
       nombre: "juan",
       correo: "juan@test.com",
       telefono: "123456789",
@@ -420,7 +408,7 @@ export const hardReservas: IReserva[] = [
     fecha_entrada: new Date(),
     numero_noches: 4,
     cliente: {
-      id: "2",
+      no_identificacion: "2",
       nombre: "juan",
       correo: "juan@test.com",
       telefono: "123456789",

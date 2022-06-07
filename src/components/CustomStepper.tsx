@@ -19,6 +19,8 @@ import { Habitaciones } from ".";
 import Clientes from "./Clientes";
 import TerminarReserva from "./TerminarReserva";
 import { Reserva, useReserva } from "../context/reserva/index";
+import IReservaBody from "../interfaces/api/ReservaBody";
+import useReservas from "../hooks/useReservas";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -98,6 +100,24 @@ const CustomStepper = () => {
   const theme = useTheme();
 
   const { reserva, reset } = useReserva();
+  const { createReserva } = useReservas();
+
+  const reservas = React.useMemo<IReservaBody[]>(
+    () =>
+      reserva.habitaciones.map(h => ({
+        fecha_entrada: h.fecha_entrada as Date,
+        numero_noches: h.numero_noches as number,
+        cliente: reserva.cliente?.no_identificacion as string,
+        habitacion: h.no_habitacion,
+      })),
+    [reserva]
+  );
+
+  React.useEffect(() => console.log(reservas), [reservas]);
+
+  const crearReservas = () => {
+    reservas.forEach(createReserva);
+  };
 
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
@@ -196,13 +216,23 @@ const CustomStepper = () => {
             >
               Atrás
             </Button>
-            <Button
-              disabled={!isOk(activeStep, reserva)}
-              onClick={handleNext}
-              variant="contained"
-            >
-              {activeStep === steps.length - 1 ? "Finalizar" : "Siguiente"}
-            </Button>
+            {activeStep === steps.length - 1 ? (
+              <Button
+                disabled={!isOk(activeStep, reserva)}
+                onClick={crearReservas}
+                variant="contained"
+              >
+                Finalizar
+              </Button>
+            ) : (
+              <Button
+                disabled={!isOk(activeStep, reserva)}
+                onClick={handleNext}
+                variant="contained"
+              >
+                Siguiente
+              </Button>
+            )}
           </Box>
         </>
       )}

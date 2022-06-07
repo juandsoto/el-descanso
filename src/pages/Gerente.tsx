@@ -15,10 +15,14 @@ import ICliente from "../interfaces/Cliente";
 import { hardReservas } from "../data/index";
 import IReserva from "../interfaces/Reserva";
 import toast from "react-hot-toast";
+import { tipoHabitaciones } from "../data";
+import useAxios from "../hooks/useAxios";
+import ITipoHabitacion from "../interfaces/TipoHabitacion";
 import OcupacionHotelChart from "../components/OcupacionHotelChart";
 import UsoDeServiciosChart from "../components/UsoDeServiciosChart";
 import CancelacionDeReservas from "../components/CancelacionDeReservas";
 import VentasPorServicioChart from "../components/VentasPorServicioChart";
+import useReservas from "../hooks/useReservas";
 const Gerente = (): JSX.Element => {
   return (
     <UserLayout>
@@ -93,27 +97,16 @@ const Gerente = (): JSX.Element => {
 
 const ExportReservasPorCliente = () => {
   const [id, setId] = React.useState<string>("");
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [reservas, setReservas] = React.useState<IReserva[]>([] as IReserva[]);
+
+  const {
+    reservas,
+    getReservasByClientId,
+    reservasByClientIdLoading: loading,
+  } = useReservas();
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    fetch(`https://jsonplaceholder.typicode.com/todos/${id}`)
-      .then(response => response.json())
-      .then(data => {
-        if (!!data.id) {
-          setLoading(false);
-          setReservas(hardReservas);
-          return;
-        }
-        console.log("no");
-        setLoading(false);
-        setReservas([]);
-        toast.error(`No se encontró el cliente con identificación ${id}`, {
-          duration: 3500,
-        });
-      });
+    getReservasByClientId(id);
   };
 
   return (
@@ -145,8 +138,8 @@ const ExportReservasPorCliente = () => {
           )}
         </Button>
       </Stack>
-      <Button fullWidth disabled={!reservas.length} variant="contained">
-        {!!reservas.length && (
+      <Button fullWidth disabled={!reservas?.length} variant="contained">
+        {!!reservas?.length && (
           <PDFDownloadLink
             style={{
               width: "100%",
@@ -167,33 +160,55 @@ const ExportReservasPorCliente = () => {
             Descargar
           </PDFDownloadLink>
         )}
-        {!reservas.length && "Descargar"}
+        {!reservas?.length && "Descargar"}
       </Button>
     </Stack>
   );
 };
 
 const ExportTiposDeHabitaciones = () => {
+  const [{ data }] = useAxios<ITipoHabitacion[]>("/tipohabitaciones/");
+
+  const habitaciones = React.useMemo(
+    () =>
+      data?.map(h => ({
+        ...h,
+        images: tipoHabitaciones.find(th => th.tipo === h.tipo)?.images || [],
+        servicios:
+          tipoHabitaciones.find(th => th.tipo === h.tipo)?.servicios || [],
+      })),
+    [data]
+  );
   return (
     <Stack alignItems="center" justifyContent="center" spacing={1}>
       <Typography variant="h6" component="h4">
         Tipos de habitación
       </Typography>
-      <PDFDownloadLink
-        fileName="tipos_de_habitaciones"
-        document={
-          <Informe
-            data={{
-              title: "Tipos de habitacion",
+      <Button disabled={!habitaciones?.length} variant="contained">
+        {!!habitaciones?.length ? (
+          <PDFDownloadLink
+            style={{
+              width: "100%",
+              textDecoration: "none",
+              color: "black",
             }}
+            fileName="tipos_de_habitaciones"
+            document={
+              <Informe
+                data={{
+                  title: "Tipos de habitacion",
+                }}
+              >
+                <TiposDeHabitacion habitaciones={habitaciones} />
+              </Informe>
+            }
           >
-            <TiposDeHabitacion />
-          </Informe>
-        }
-        style={{ textDecoration: "none" }}
-      >
-        <Button variant="contained">Descargar</Button>
-      </PDFDownloadLink>
+            Descargar
+          </PDFDownloadLink>
+        ) : (
+          <CircularProgress color="inherit" size={25} />
+        )}
+      </Button>
     </Stack>
   );
 };

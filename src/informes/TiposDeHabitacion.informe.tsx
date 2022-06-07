@@ -1,51 +1,58 @@
 import React from "react";
 import ReactPDF from "@react-pdf/renderer";
 const { Image, Text, View } = ReactPDF;
-import { tipoHabitaciones } from "../data";
 import styles from "../pdfStyles";
 import { formatCurrency } from "../utils";
+import ITipoHabitacion from "../interfaces/TipoHabitacion";
 
-const TiposDeHabitacion = () => {
+interface TiposDeHabitacionProps {
+  habitaciones: ITipoHabitacion[];
+}
+
+const TiposDeHabitacion = (props: TiposDeHabitacionProps) => {
+  const { habitaciones } = props;
   return (
     <View>
-      {tipoHabitaciones.map((habitacion, index) => {
-        return (
-          <View
-            key={index}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              marginBottom: 10,
-            }}
-          >
-            <Text
+      {habitaciones
+        ?.sort((a, b) => a.precio - b.precio)
+        .map((habitacion, index) => {
+          return (
+            <View
+              key={index}
               style={{
-                ...styles.subtitle1,
-                color: "#0cb0a9",
-                textTransform: "capitalize",
+                display: "flex",
+                flexDirection: "column",
+                marginBottom: 10,
               }}
             >
-              {habitacion.nombre}
-            </Text>
-            <Text style={styles.text}>{habitacion.description}</Text>
-            <View style={styles.list}>
-              <Text style={styles.text}>- Servicios: </Text>
-              {habitacion.services.map((service, index) => (
-                <Text key={index} style={styles.item}>
-                  {service}
-                  {index !== habitacion.services.length - 1 ? ", " : "."}
-                </Text>
-              ))}
-            </View>
-            <View style={styles.list}>
-              <Text style={styles.text}>- Precio: </Text>
-              <Text key={index} style={{ ...styles.item, color: "#0cb0a9" }}>
-                {formatCurrency(habitacion.precio)}
+              <Text
+                style={{
+                  ...styles.subtitle1,
+                  color: "#0cb0a9",
+                  textTransform: "capitalize",
+                }}
+              >
+                {habitacion.tipo}
               </Text>
+              <Text style={styles.text}>{habitacion.descripcion}</Text>
+              <View style={styles.list}>
+                <Text style={styles.text}>- Servicios: </Text>
+                {habitacion.servicios.map((servicio, index) => (
+                  <Text key={index} style={styles.item}>
+                    {servicio}
+                    {index !== habitacion.servicios.length - 1 ? ", " : "."}
+                  </Text>
+                ))}
+              </View>
+              <View style={styles.list}>
+                <Text style={styles.text}>- Precio: </Text>
+                <Text key={index} style={{ ...styles.item, color: "#0cb0a9" }}>
+                  {formatCurrency(habitacion.precio)}
+                </Text>
+              </View>
             </View>
-          </View>
-        );
-      })}
+          );
+        })}
     </View>
   );
 };

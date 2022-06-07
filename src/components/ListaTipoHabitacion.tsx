@@ -41,15 +41,17 @@ const ListaTipoHabitacion = (): JSX.Element => {
         }}
         py={2}
       >
-        {habitaciones?.map((habitacion, index) => {
-          return (
-            <TipoHabitacion
-              key={index}
-              habitacion={habitacion}
-              minWidth="350px"
-            />
-          );
-        })}
+        {habitaciones
+          ?.sort((a, b) => a.precio - b.precio)
+          .map((habitacion, index) => {
+            return (
+              <TipoHabitacion
+                key={index}
+                habitacion={habitacion}
+                minWidth="350px"
+              />
+            );
+          })}
       </Stack>
     </Stack>
   );

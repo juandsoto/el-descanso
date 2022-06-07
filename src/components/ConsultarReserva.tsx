@@ -1,6 +1,6 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
-import { hardReservas, nombreServicios } from "../data/index";
+import { nombreServicios } from "../data/index";
 import {
   Box,
   TextField,
@@ -22,12 +22,13 @@ import { formatCurrency, isServiceAvailable } from "../utils";
 import { useTheme } from "@mui/material/styles";
 import { DotLoader } from "react-spinners";
 import { motion } from "framer-motion";
+import useReservas from "../hooks/useReservas";
+import moment from "moment";
 
 const ConsultarReserva = () => {
   const [option, setOption] = React.useState<"reserva" | "cliente">("reserva");
   const valueRef = React.useRef<HTMLInputElement>(null);
-  // const [reserva, setReserva] = React.useState<IReserva | null>();
-  const [reservas, setReservas] = React.useState<IReserva[] | null>();
+  const { reservas, getReservasById, getReservasByClientId } = useReservas();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,13 +36,11 @@ const ConsultarReserva = () => {
     const { value } = valueRef.current;
 
     if (option === "reserva") {
-      setReservas([hardReservas[1]]);
+      getReservasById(Number(value));
     }
     if (option === "cliente") {
-      setReservas(hardReservas);
+      getReservasByClientId(value);
     }
-
-    console.log({ value, option });
   };
 
   return (
@@ -129,7 +128,10 @@ const ConsultarReserva = () => {
             </RenderCliente>
           )}
         </Stack>
-        <Stack>
+        <Stack
+          className="hide-scrollbar"
+          sx={{ maxHeight: "400px", overflowY: "scroll" }}
+        >
           {/* {!reserva && !reservas && <DotLoader />} */}
           {/* {reserva && <RenderReservas reserva={reserva} />} */}
           {reservas &&
@@ -175,6 +177,42 @@ interface RenderReservasProps {
 
 const RenderReservas = (props: RenderReservasProps) => {
   const { reserva } = props;
+
+  const { fecha_entrada } = reserva;
+  const fecha_salida = moment(fecha_entrada).add(reserva.numero_noches, "days");
+  const inProgress = moment().isBetween(fecha_entrada, fecha_salida);
+  console.log(inProgress);
+  const isCancelada = reserva.cancelada;
+  const showCheckin = moment().isBetween(
+    moment(fecha_entrada).subtract(6, "hours"),
+    moment(fecha_entrada).add(6, "hours")
+  );
+
+  const getEstado = (): {
+    color: string;
+    estado: "cancelada" | "en progreso" | "completada" | "pendiente";
+  } => {
+    if (isCancelada)
+      return {
+        color: "error.main",
+        estado: "cancelada",
+      };
+    if (inProgress)
+      return {
+        color: "secondary.main",
+        estado: "en progreso",
+      };
+    if (moment(fecha_salida).isBefore(moment()))
+      return {
+        color: "primary.main",
+        estado: "completada",
+      };
+    return {
+      color: "warning.main",
+      estado: "pendiente",
+    };
+  };
+
   return (
     <Box pb={1}>
       <Stack
@@ -194,39 +232,56 @@ const RenderReservas = (props: RenderReservasProps) => {
               Reserva #{reserva.no_reserva}
             </Typography>
             <Typography component="span">
-              {reserva.fecha_entrada.toLocaleDateString()} -{" "}
-              {reserva.fecha_entrada.toLocaleTimeString()} -{" "}
+              {moment(reserva.fecha_entrada)
+                .add(5, "hours")
+                .format("DD/MM/YYYY, HH:mm")}
+            </Typography>
+            <Typography component="span">
               {reserva.numero_noches}{" "}
               {reserva.numero_noches === 1 ? "noche" : "noches"}
             </Typography>
           </Stack>
           <Divider />
-          <Stack direction="row" justifyContent="space-between">
-            <Stack alignItems="flex-start" justifyContent="center">
+          <Stack direction="row" justifyContent="space-between" spacing={2}>
+            <Stack
+              alignItems="flex-start"
+              justifyContent="center"
+              textTransform="capitalize"
+            >
               {Object.entries(reserva.habitacion || {}).map(
                 ([key, value]: [string, any]) => {
+                  if (key === "tipo")
+                    return Object.entries(value).map(
+                      ([tKey, tValue]: [string, any]) =>
+                        tKey !== "descripcion" && (
+                          <Typography key={tKey}>
+                            {tKey}:{" "}
+                            {tKey === "precio"
+                              ? formatCurrency(tValue as number)
+                              : tValue}
+                          </Typography>
+                        )
+                    );
+                  if (key === "estado") return null;
                   return (
                     <Typography key={key}>
-                      {key} -{" "}
-                      {key === "precio"
-                        ? formatCurrency(value as number)
-                        : value}
+                      {key}: {value}
                     </Typography>
                   );
                 }
               )}
+              <Typography color={getEstado().color}>
+                estado: {getEstado().estado}
+              </Typography>
             </Stack>
             <Stack justifyContent="space-around">
-              {/* reserva.fecha_entrada.getTime() + 1000 * 60 * 60 >
-                new Date().getTime() */}
-              {reserva.habitacion.estado !== "ocupada" && (
+              {getEstado().estado === "pendiente" && (
                 <>
-                  <Button variant="outlined" color="primary">
-                    Check-in
-                  </Button>
-                  {/* reserva.fecha_entrada.getTime() +
-                1000 * 60 * 60 * 24 * reserva.numero_noches >
-							new Date().getTime() */}
+                  {showCheckin && (
+                    <Button variant="outlined" color="primary">
+                      Check-in
+                    </Button>
+                  )}
                   <Button variant="outlined" color="error">
                     Cancelar
                   </Button>
@@ -235,31 +290,35 @@ const RenderReservas = (props: RenderReservasProps) => {
             </Stack>
           </Stack>
         </Box>
-
-        <Stack>
-          <Typography color="primary" variant="subtitle1" component="h5">
-            Servicios Incluidos
-          </Typography>
-          <FormGroup>
-            {nombreServicios.map(
-              (servicio, index) =>
-                isServiceAvailable(reserva.habitacion.tipo, servicio) && (
-                  <FormControlLabel
-                    sx={{ textTransform: "capitalize" }}
-                    key={index}
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={false}
-                        onChange={() => {}}
-                      />
-                    }
-                    label={servicio}
-                  />
-                )
-            )}
-          </FormGroup>
-        </Stack>
+        {inProgress && !isCancelada && (
+          <Stack>
+            <Typography color="primary" variant="subtitle1" component="h5">
+              Servicios Incluidos
+            </Typography>
+            <FormGroup>
+              {nombreServicios.map(
+                (servicio, index) =>
+                  isServiceAvailable(
+                    reserva.habitacion.tipo.tipo,
+                    servicio
+                  ) && (
+                    <FormControlLabel
+                      sx={{ textTransform: "capitalize" }}
+                      key={index}
+                      control={
+                        <Checkbox
+                          size="small"
+                          checked={false}
+                          onChange={() => {}}
+                        />
+                      }
+                      label={servicio}
+                    />
+                  )
+              )}
+            </FormGroup>
+          </Stack>
+        )}
       </Stack>
     </Box>
   );

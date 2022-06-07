@@ -122,8 +122,9 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
             id="standard-basic"
             label="Buscar..."
             variant="standard"
-            value={props.search}
+            // value={props.search}
             onChange={props.onChangeSearch}
+            inputProps={{ "aria-label": "controlled" }}
           />
         </Stack>
         <TableContainer

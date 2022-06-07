@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../context/auth/index";
 import useUsuarios from "../hooks/useUsuarios";
 import { useAppContext } from "../context/index";
+import { debounce } from "lodash";
 
 const initialSelected: IUsuario = {
   id: "",
@@ -37,11 +38,10 @@ const Usuarios = (): JSX.Element => {
     [usuarios, search]
   );
 
-  const onChangeSearch = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
-    [setSearch]
-  );
+  const onChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearch(e.target.value);
 
+  const debounceOnChange = debounce(onChangeSearch, 300);
   return (
     <Table
       title="Usuarios"
@@ -50,7 +50,7 @@ const Usuarios = (): JSX.Element => {
       rows={filtroUsuarios ?? []}
       search={search}
       setSearch={setSearch}
-      onChangeSearch={onChangeSearch}
+      onChangeSearch={debounceOnChange}
       initialSelected={initialSelected}
       onCreate={createUser}
       onUpdate={updateUser}

@@ -2,6 +2,7 @@ import React from "react";
 import useClientes from "../hooks/useClientes";
 import ICliente from "../interfaces/Cliente";
 import Table from "./Table";
+import { debounce } from "lodash";
 
 const initialSelected: ICliente = {
   no_identificacion: "",
@@ -31,10 +32,10 @@ const Clientes = (props: ClientesProps): JSX.Element => {
     [clientes, search]
   );
 
-  const onChangeSearch = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
-    [setSearch]
-  );
+  const onChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearch(e.target.value);
+
+  const debounceOnChange = debounce(onChangeSearch, 300);
 
   return (
     <Table
@@ -44,7 +45,7 @@ const Clientes = (props: ClientesProps): JSX.Element => {
       rows={filtroClientes ?? []}
       search={search}
       setSearch={setSearch}
-      onChangeSearch={onChangeSearch}
+      onChangeSearch={debounceOnChange}
       initialSelected={initialSelected}
       onCreate={createClient}
       onUpdate={updateClient}

@@ -6,6 +6,7 @@ import styles from "../pdfStyles";
 import { formatCurrency } from "../utils";
 import { hardReservas } from "../data/index";
 import IReserva from "../interfaces/Reserva";
+import moment from "moment";
 
 interface ReservasPorClienteProps {
   reservas: IReserva[];
@@ -46,59 +47,90 @@ const ReservasPorCliente = (props: ReservasPorClienteProps) => {
           )}
         </View>
       </View>
-      {reservas.map((reserva, index) => {
-        return (
-          <View
-            key={index}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              marginBottom: 10,
-            }}
-          >
-            <Text
+      {reservas
+        .sort((a, b) => a.no_reserva - b.no_reserva)
+        .map((reserva, index) => {
+          return (
+            <View
+              key={index}
               style={{
-                ...styles.subtitle1,
-                color: "#0cb0a9",
-                textTransform: "capitalize",
+                display: "flex",
+                flexDirection: "column",
+                marginBottom: 10,
               }}
             >
-              Reserva #{reserva.no_reserva}
-            </Text>
-            <View style={styles.list}>
-              <Text style={styles.text}>- Habitacion: </Text>
-              {Object.entries(reserva.habitacion).map(([key, value], index) => {
-                if (key === "estado") {
-                  return null;
-                }
-                return (
-                  <Text
-                    key={key}
-                    style={{ ...styles.item, textTransform: "capitalize" }}
-                  >
-                    {key} - {value}
-                    {index !== Object.values(reserva.habitacion).length - 1
-                      ? ", "
-                      : "."}
-                  </Text>
-                );
-              })}
-            </View>
-            <View style={styles.list}>
-              <Text style={styles.text}>- Fecha de entrada: </Text>
-              <Text key={index} style={styles.item}>
-                {reserva.fecha_entrada.toLocaleString()}
+              <Text
+                style={{
+                  ...styles.subtitle1,
+                  color: "#0cb0a9",
+                  textTransform: "capitalize",
+                }}
+              >
+                Reserva #{reserva.no_reserva}
               </Text>
+              <View style={styles.list}>
+                <Text style={styles.text}>- Habitacion: </Text>
+                {Object.entries(reserva.habitacion).map(
+                  ([key, value], index) => {
+                    if (key === "estado") {
+                      return null;
+                    }
+                    if (key === "tipo") {
+                      return Object.entries(reserva.habitacion.tipo).map(
+                        ([tKey, tValue], index) => {
+                          if (tKey === "descripcion") return null;
+                          return (
+                            <Text
+                              key={tKey}
+                              style={{
+                                ...styles.item,
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {tKey}:{" "}
+                              {tKey === "precio"
+                                ? formatCurrency(Number(tValue))
+                                : tValue}
+                              {index !==
+                              Object.values(reserva.habitacion.tipo).length - 1
+                                ? ", "
+                                : "."}
+                            </Text>
+                          );
+                        }
+                      );
+                    }
+                    return (
+                      <Text
+                        key={key}
+                        style={{ ...styles.item, textTransform: "capitalize" }}
+                      >
+                        {key}: {value}
+                        {index !== Object.values(reserva.habitacion).length - 1
+                          ? ", "
+                          : "."}
+                      </Text>
+                    );
+                  }
+                )}
+              </View>
+              <View style={styles.list}>
+                <Text style={styles.text}>- Fecha de entrada: </Text>
+                <Text key={index} style={styles.item}>
+                  {moment(reserva.fecha_entrada)
+                    .add(5, "hours")
+                    .format("DD/MM/YYYY, HH:mm")}
+                </Text>
+              </View>
+              <View style={styles.list}>
+                <Text style={styles.text}>- Número de noches: </Text>
+                <Text key={index} style={styles.item}>
+                  {reserva.numero_noches}
+                </Text>
+              </View>
             </View>
-            <View style={styles.list}>
-              <Text style={styles.text}>- Número de noches: </Text>
-              <Text key={index} style={styles.item}>
-                {reserva.numero_noches}
-              </Text>
-            </View>
-          </View>
-        );
-      })}
+          );
+        })}
     </View>
   );
 };

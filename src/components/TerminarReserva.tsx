@@ -14,11 +14,11 @@ import { formatCurrency } from "../utils";
 import { useTheme } from "@mui/material/styles";
 import moment from "moment";
 import { motion } from "framer-motion";
+import IReservaBody from "../interfaces/api/ReservaBody";
 
 const TerminarReserva = () => {
   const { reserva } = useReserva();
   const theme = useTheme();
-  const [reservaCompleta, setReservaCompleta] = React.useState<IReserva>();
 
   const precioTotal = React.useCallback<() => number>(
     () =>
@@ -183,9 +183,11 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
             InputLabelProps={{
               shrink: true,
             }}
-            inputProps={{
-              min: moment(new Date()).format("YYYY-MM-DD[T]HH:mm:ss"),
-            }}
+            inputProps={
+              {
+                // min: moment(new Date()).format("YYYY-MM-DD[T]HH:mm:ss"),
+              }
+            }
             name="fecha_entrada"
             value={props.habitacion.fecha_entrada ?? ""}
             onChange={onChange}

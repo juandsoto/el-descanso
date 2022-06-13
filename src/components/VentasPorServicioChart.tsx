@@ -1,20 +1,23 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import { ventasMensualesPorServicio } from "../data";
-import { TextField, Tooltip } from "@mui/material";
+import { TextField, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
 import toast from "react-hot-toast";
+import { ventasMensualesPorServicio } from "../data";
 import { getMonth } from "../utils";
+import useVentasPorServicio from "../hooks/useVentasPorServicio";
 
 const VentasPorServicioChart = () => {
-  const [fecha, setFecha] = React.useState<Date>(new Date());
+  const [fecha, setFecha] = React.useState<string>(moment().format("YYYY-MM"));
+  const { data, getData } = useVentasPorServicio();
 
-  //TODO: API call moment(fecha.getTime() + 1000 * 60 * 60 * 6).format("yyyy-MM")
-  // React.useEffect(() => {
-  // },[fecha])
+  React.useEffect(() => {
+    getData(fecha);
+  }, []);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFecha(new Date(e.target.value));
+    setFecha(e.target.value);
+    getData(e.target.value);
     toast.success(
       `Ventas mensuales por servicio: ${getMonth(
         moment(e.target.value).format("MM")
@@ -23,15 +26,8 @@ const VentasPorServicioChart = () => {
   };
   return (
     <>
-      <Line
-        options={ventasMensualesPorServicio.options}
-        data={ventasMensualesPorServicio.data}
-      />
-      <Tooltip
-        title={`Fecha: ${moment(fecha.getTime() + 1000 * 60 * 60 * 6).format(
-          "MM/YYYY"
-        )}`}
-      >
+      <Line {...data} />
+      <Tooltip title={`Fecha: ${fecha}`}>
         <TextField
           sx={{
             position: "absolute",
@@ -46,7 +42,7 @@ const VentasPorServicioChart = () => {
             shrink: true,
           }}
           inputProps={{
-            max: moment(new Date()).format("yyyy-MM"),
+            max: moment().format("yyyy-MM"),
           }}
           name="fecha_entrada"
           value={fecha}
@@ -54,9 +50,13 @@ const VentasPorServicioChart = () => {
           type="month"
         />
       </Tooltip>
-      {/* <button style={{ marginBottom: "10px" }} onClick={getImage}>
-        Take screenshot
-      </button> */}
+      {!data.data.labels.length && (
+        <Typography textAlign="center" color="error">
+          No existen datos en el mes de {getMonth(fecha.split("-")[1])} de{" "}
+          {fecha.split("-")[0]} <br />
+          Selecciona otro mes!
+        </Typography>
+      )}
     </>
   );
 };

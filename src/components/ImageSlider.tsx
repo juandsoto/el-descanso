@@ -6,7 +6,6 @@ const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   const { images } = props;
   return (
     <Box
-      // className="hide-scrollbar_xs"
       className="hide-scrollbar-x"
       sx={{
         height: "250px",
@@ -17,7 +16,6 @@ const ImageSlider = (props: ImageSliderProps): JSX.Element => {
         overflowX: "scroll",
         margin: "10px 0",
         borderRadius: "20px",
-        cursor: "grab",
       }}
     >
       {images.map(image => (

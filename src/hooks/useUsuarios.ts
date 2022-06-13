@@ -1,12 +1,11 @@
 import React from "react";
 import useAxios from "../hooks/useAxios";
 import toast from "react-hot-toast";
-import { IUsuario } from "../interfaces/Usuario";
+import IUsuario from "../interfaces/Usuario";
 import { useAuth } from "../context/auth/index";
 import { useAppContext } from "../context/index";
 
 const useUsuarios = () => {
-  const [state, setState] = React.useState<Omit<IUsuario, "password">[]>();
   const { user } = useAuth();
   const {
     backdrop: { openBackdrop, closeBackdrop },
@@ -74,28 +73,23 @@ const useUsuarios = () => {
   };
 
   React.useEffect(() => {
-    if (!usuarios?.length) return;
-    setState(usuarios);
-  }, [usuarios]);
-
-  React.useEffect(() => {
     if (!postResponse) return;
     closeBackdrop();
     toast.success(postResponse.detail);
-    setState(prev => [
-      {
-        id: "0",
-        nombre: "hard",
-        rol: "recepcionista",
-        username: "hard",
-        telefono: "123456789",
-      },
-      ...prev!,
-    ]);
   }, [postResponse]);
 
+  React.useEffect(() => {
+    if (!patchResponse) return;
+    toast.success("Usuario actualizado con éxito!");
+  }, [patchResponse]);
+
+  React.useEffect(() => {
+    if (!deleteResponse) return;
+    toast.success("Usuario eliminado con éxito!");
+  }, [deleteResponse]);
+
   return {
-    usuarios: state,
+    usuarios,
     createUser,
     updateUser,
     deleteUser: deleteUserById,

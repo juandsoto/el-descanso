@@ -8,7 +8,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Typography,
   Stack,
   Checkbox,
@@ -16,24 +15,20 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputAdornment,
-  Box,
+  CircularProgress,
 } from "@mui/material";
 
 import useFilter from "../hooks/useFilter";
 import Filtro from "./Filtro";
 import { useReserva } from "../context/reserva";
-import { hardHabitaciones, nombreTipoHabitaciones } from "../data";
+import { nombreTipoHabitaciones } from "../data";
 import { useTheme } from "@mui/material/styles";
 import { Button } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import ConfirmDialog from "./ConfirmDialog";
-import AddIcon from "@mui/icons-material/Add";
-import EditDrawer from "./EditDrawer";
 import { useAuth } from "../context/auth/index";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { formatCurrency } from "../utils";
-import ITipoHabitacion from "../interfaces/TipoHabitacion";
 import useHabitaciones from "../hooks/useHabitaciones";
 
 interface HabitacionesProps {}
@@ -51,7 +46,7 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
   >("");
   const theme = useTheme();
   const { user } = useAuth();
-  const { habitaciones, createHabitacion } = useHabitaciones();
+  const { habitaciones, createHabitacion, loading } = useHabitaciones();
 
   const [deleting, setDeleting] = React.useState<IHabitacion | null>();
 
@@ -157,10 +152,9 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
       </Stack>
       <TableContainer
         className="hide-scrollbar"
-        component={Paper}
         sx={{
           width: "100%",
-          maxHeight: "400px",
+          height: "400px",
           boxShadow: `2px 2px 7px ${theme.palette.grey[900]}`,
         }}
       >
@@ -193,18 +187,28 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
               {!habitacionesFiltradas?.length ? (
                 <TableRow
                   sx={{
-                    // "&:last-child td, &:last-child th": { border: 0 },
+                    "&:last-child td, &:last-child th": { border: 0 },
                     width: "100%",
                     textAlign: "center",
                   }}
                 >
-                  <TableCell
-                    align="center"
-                    colSpan={5}
-                    sx={{ color: "error.main" }}
-                  >
-                    No existen habitaciones
-                  </TableCell>
+                  {loading ? (
+                    <TableCell
+                      align="center"
+                      colSpan={5}
+                      sx={{ color: "error.main" }}
+                    >
+                      <CircularProgress color="primary" size={25} />
+                    </TableCell>
+                  ) : (
+                    <TableCell
+                      align="center"
+                      colSpan={5}
+                      sx={{ color: "error.main" }}
+                    >
+                      No existen habitaciones
+                    </TableCell>
+                  )}
                 </TableRow>
               ) : (
                 habitacionesFiltradas.map(habitacion => {
@@ -243,7 +247,7 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
                       {inAdminPanel && (
                         <TableCell align="center">
                           <Button
-                            variant="outlined"
+                            variant="text"
                             color="error"
                             onClick={() => setDeleting(habitacion)}
                           >
@@ -265,7 +269,6 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
           handleClose={() => setDeleting(null)}
           dialogInfo={{
             title: `Eliminar habitación no.${deleting?.no_habitacion}`,
-            // item: deleting,
             description: `¿Está seguro que desea eliminar esta habitación?`,
             onCancel: () => setDeleting(null),
             onConfirm: () => {
@@ -290,8 +293,15 @@ interface CheckHabitacionProps {
 
 const CheckHabitacion = (props: CheckHabitacionProps): JSX.Element => {
   const { reserva, setReserva } = useReserva();
+  const [checked, setChecked] = React.useState<boolean>(false);
+  // const [checked, setChecked] = React.useState<() => boolean>(() => {
+  //   return reserva.habitaciones.some(
+  //     h => h.no_habitacion === props.habitacion.no_habitacion
+  //   );
+  // });
 
   const onCheck = () => {
+    setChecked(prev => !prev);
     setReserva(prev => {
       const habitaciones = prev.habitaciones.some(
         h => h.no_habitacion === props.habitacion.no_habitacion
@@ -304,13 +314,28 @@ const CheckHabitacion = (props: CheckHabitacionProps): JSX.Element => {
       return { ...prev, habitaciones };
     });
   };
+  // React.useEffect(() => {
+  //   setReserva(prev => {
+  //     const habitaciones = !checked
+  //       ? prev.habitaciones.filter(
+  //           h => h.no_habitacion !== props.habitacion.no_habitacion
+  //         )
+  //       : [...prev.habitaciones, props.habitacion];
+
+  //     return { ...prev, habitaciones };
+  //   });
+  // }, [checked]);
 
   return (
     <Checkbox
       disabled={props.habitacion.estado !== "disponible"}
-      checked={reserva.habitaciones.some(
-        h => h.no_habitacion === props.habitacion.no_habitacion
-      )}
+      // checked={Boolean(checked)}
+      // onChange={() => setChecked(() => !Boolean(checked))}
+      checked={
+        reserva.habitaciones.some(
+          h => h.no_habitacion === props.habitacion.no_habitacion
+        ) || checked
+      }
       onChange={onCheck}
       inputProps={{ "aria-label": "controlled" }}
     />

@@ -1,6 +1,6 @@
 export type Rol = "gerente" | "cajero" | "recepcionista" | "administrador" | "";
 
-export interface IUsuario {
+export default interface IUsuario {
   id: string;
   nombre: string;
   username: string;

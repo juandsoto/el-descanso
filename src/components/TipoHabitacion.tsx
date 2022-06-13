@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React from "react";
 
 import {
   CardActions,
@@ -21,8 +21,10 @@ interface HabitacionProps {
 }
 
 const TipoHabitacion = (props: HabitacionProps): JSX.Element => {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<ITipoHabitacion>(props.habitacion);
+  const [open, setOpen] = React.useState(false);
+  const [selected, setSelected] = React.useState<ITipoHabitacion>(
+    props.habitacion
+  );
 
   const handleOpen = (habitacion: ITipoHabitacion) => {
     setOpen(true);

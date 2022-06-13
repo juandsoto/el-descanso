@@ -11,10 +11,14 @@ const initialSelected: ICliente = {
   correo: "",
 };
 
-interface ClientesProps {}
-
-const Clientes = (props: ClientesProps): JSX.Element => {
-  const { clientes, createClient, updateClient, deleteClient } = useClientes();
+const Clientes = (): JSX.Element => {
+  const {
+    clientes: data,
+    createClient,
+    updateClient,
+    deleteClient,
+  } = useClientes();
+  const [clientes, setClientes] = React.useState<ICliente[]>([]);
   const [search, setSearch] = React.useState<string>("");
 
   const filtroClientes = React.useMemo(
@@ -32,6 +36,29 @@ const Clientes = (props: ClientesProps): JSX.Element => {
     [clientes, search]
   );
 
+  const onCreate = (cliente: ICliente) => {
+    setClientes(prev => [cliente, ...prev]);
+    createClient(cliente);
+  };
+
+  const onUpdate = (cliente: ICliente) => {
+    setClientes(prev =>
+      prev.map(c =>
+        c.no_identificacion === cliente.no_identificacion ? cliente : c
+      )
+    );
+    updateClient(cliente);
+  };
+
+  const onDelete = (id: string) => {
+    setClientes(prev => prev.filter(c => c.no_identificacion !== id));
+    deleteClient(id);
+  };
+
+  React.useEffect(() => {
+    data && setClientes(data);
+  }, [data]);
+
   const onChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearch(e.target.value);
 
@@ -47,9 +74,9 @@ const Clientes = (props: ClientesProps): JSX.Element => {
       setSearch={setSearch}
       onChangeSearch={debounceOnChange}
       initialSelected={initialSelected}
-      onCreate={createClient}
-      onUpdate={updateClient}
-      onDelete={deleteClient}
+      onCreate={onCreate}
+      onUpdate={onUpdate}
+      onDelete={onDelete}
     />
   );
 };

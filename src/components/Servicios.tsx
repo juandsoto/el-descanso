@@ -27,27 +27,8 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
   const [servicios, setServicios] =
     React.useState<IAvailableServices[]>(availableServices);
 
-  const { user } = useAuth();
-
-  const toggleService = (habitacionName: string, servicio: string) => {
-    const index = servicios.findIndex(
-      item => item.habitacion === habitacionName
-    );
-    setServicios(prev => {
-      return [
-        ...prev.slice(0, index),
-        {
-          ...prev[index],
-          [servicio]: !prev[index][servicio as keyof IAvailableServices],
-        },
-        ...prev.slice(index + 1),
-      ] as IAvailableServices[];
-    });
-  };
-
   return (
     <Box
-      // className={`${props.bgImage ? "blob" : ""}`}
       sx={{
         height: "100%",
         display: "flex",
@@ -98,47 +79,19 @@ const Servicios = (props: ServiciosProps): JSX.Element => {
                 </TableCell>
                 {nombreServicios.map((item: string, index) => {
                   return (
-                    <>
-                      {user.rol === "administrador" ? (
-                        <TableCell
-                          key={`admin ${servicio.habitacion}-${index}`}
-                          align="center"
-                          sx={{ cursor: "pointer" }}
-                          onClick={() =>
-                            toggleService(servicio.habitacion, item)
-                          }
-                        >
-                          <Tooltip title="modificar" followCursor>
-                            {/*ts-ignore*/}
-                            {servicio[item as keyof IAvailableServices] ? (
-                              <CheckIcon
-                                sx={{ color: "#0CB0A9", fontSize: "2rem" }}
-                              />
-                            ) : (
-                              <CloseIcon
-                                sx={{ color: "#f00", fontSize: "2rem" }}
-                              />
-                            )}
-                          </Tooltip>
-                        </TableCell>
+                    <TableCell
+                      align="center"
+                      key={`${servicio.habitacion}-${index}`}
+                    >
+                      {/*ts-ignore*/}
+                      {servicio[item as keyof IAvailableServices] ? (
+                        <CheckIcon
+                          sx={{ color: "#0CB0A9", fontSize: "2rem" }}
+                        />
                       ) : (
-                        <TableCell
-                          align="center"
-                          key={`${servicio.habitacion}-${index}`}
-                        >
-                          {/*ts-ignore*/}
-                          {servicio[item as keyof IAvailableServices] ? (
-                            <CheckIcon
-                              sx={{ color: "#0CB0A9", fontSize: "2rem" }}
-                            />
-                          ) : (
-                            <CloseIcon
-                              sx={{ color: "#f00", fontSize: "2rem" }}
-                            />
-                          )}
-                        </TableCell>
+                        <CloseIcon sx={{ color: "#f00", fontSize: "2rem" }} />
                       )}
-                    </>
+                    </TableCell>
                   );
                 })}
               </TableRow>

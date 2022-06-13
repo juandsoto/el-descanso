@@ -1,15 +1,14 @@
 import React from "react";
-import { Stack, Box, Typography } from "@mui/material";
+import { Stack, Box, Typography, CircularProgress } from "@mui/material";
 import useAxios from "../hooks/useAxios";
 import { useAuth } from "../context/auth/index";
-import CircularProgress from "@mui/material/CircularProgress";
 
 const CancelacionDeReservas = () => {
   const { user } = useAuth();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${user.token}`,
   };
-  const [{ data: cancelacion, loading, error }] = useAxios<{
+  const [{ data: cancelacion, loading }] = useAxios<{
     porcentaje_cancelacion: number;
   }>({
     url: "/porcentajecancelacion/",

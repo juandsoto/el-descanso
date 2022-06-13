@@ -16,18 +16,23 @@ import {
   useTheme,
   Stack,
 } from "@mui/material";
-import ITipoHabitacion from "../interfaces/TipoHabitacion";
+import React from "react";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import IronIcon from "@mui/icons-material/Iron";
 import WavesIcon from "@mui/icons-material/Waves";
 import LocalBarIcon from "@mui/icons-material/LocalBar";
 import StarRateIcon from "@mui/icons-material/StarRate";
+import toast from "react-hot-toast";
+import ITipoHabitacion, {
+  NombreTipoHabitacion,
+} from "../interfaces/TipoHabitacion";
 import ImageSlider from "./ImageSlider";
 import { useAuth } from "../context/auth/index";
-import React from "react";
 import EditDialog from "./EditDialog";
-import { formatCurrency } from "../utils/index";
+import useHabitaciones from "../hooks/useHabitaciones";
+import useAxios from "../hooks/useAxios";
+import { formatCurrency } from "../utils";
 
 interface HabitacionModalProps {
   open: boolean;
@@ -39,8 +44,30 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
   const { open, handleClose, habitacion } = props;
   const [openDialog, setOpenDialog] = React.useState(false);
   const [precio, setPrecio] = React.useState<number>(habitacion.precio);
-  const theme = useTheme();
   const { user } = useAuth();
+
+  const [{ data: response }, patchHabitacion] = useAxios(
+    {
+      method: "PATCH",
+    },
+    { manual: true }
+  );
+
+  const cambiarPrecioHabitacion = (
+    tipo: Omit<NombreTipoHabitacion, "todas">,
+    precio: number
+  ) => {
+    patchHabitacion({
+      url: `/tipohabitacion/${tipo}/`,
+      data: {
+        precio,
+      },
+    });
+  };
+
+  React.useEffect(() => {
+    response && toast.success("Precio actualizado!");
+  }, [response]);
 
   const style: SxProps = {
     position: "absolute" as "absolute",
@@ -89,15 +116,11 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
           timeout: 500,
         }}
         sx={{
-          color: theme.palette.text.primary,
+          color: "text.primary",
         }}
       >
         <Fade in={open}>
-          <Box
-            // className="hide-scrollbar-y_xs"
-            className="hide-scrollbar-y"
-            sx={style}
-          >
+          <Box className="hide-scrollbar-y" sx={style}>
             <Box sx={{ flex: 1 }}>
               <Box
                 display="flex"
@@ -163,10 +186,10 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                   onClick={handleClose}
                   sx={{
                     display: { xs: "none", sm: "block" },
-                    backgroundColor: theme.palette.primary.main,
-                    color: theme.palette.text.primary,
+                    backgroundColor: "primary.main",
+                    color: "text.primary",
                     "&:hover": {
-                      backgroundColor: theme.palette.primary.main,
+                      backgroundColor: "primary.main",
                     },
                   }}
                 >
@@ -188,6 +211,7 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                       onCancel: () => setOpenDialog(false),
                       onConfirm: (value: number) => {
                         setPrecio(value);
+                        cambiarPrecioHabitacion(habitacion.tipo, value);
                         setOpenDialog(false);
                       },
                     }}

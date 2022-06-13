@@ -1,26 +1,34 @@
 import React from "react";
-import Box from "@mui/material/Box";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-
-import { styled, useTheme } from "@mui/material/styles";
-import Stack from "@mui/material/Stack";
-import StepLabel from "@mui/material/StepLabel";
+import {
+  Stack,
+  StepLabel,
+  Avatar,
+  Box,
+  Divider,
+  Stepper,
+  Step,
+  Button,
+  Typography,
+} from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
 import VideoLabelIcon from "@mui/icons-material/VideoLabel";
+import { StepIconProps } from "@mui/material/StepIcon";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
-import { StepIconProps } from "@mui/material/StepIcon";
-import { Habitaciones } from ".";
 import Clientes from "./Clientes";
 import TerminarReserva from "./TerminarReserva";
 import { Reserva, useReserva } from "../context/reserva/index";
 import IReservaBody from "../interfaces/api/ReservaBody";
+import Habitaciones from "./Habitaciones";
+import CircularProgress from "@mui/material/CircularProgress";
 import useReservas from "../hooks/useReservas";
+import { ReservaResponse } from "../interfaces/api/ReservaPostResponse";
+import useHabitaciones from "../hooks/useHabitaciones";
+import moment from "moment";
+import ICliente from "../interfaces/Cliente";
+import { styled, useTheme } from "@mui/material/styles";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -100,7 +108,13 @@ const CustomStepper = () => {
   const theme = useTheme();
 
   const { reserva, reset } = useReserva();
-  const { createReserva } = useReservas();
+  const {
+    postReservas,
+    createReservas,
+    reset: resetPostReservas,
+  } = useReservas();
+
+  const { cambiarEstadosHabitaciones } = useHabitaciones();
 
   const reservas = React.useMemo<IReservaBody[]>(
     () =>
@@ -116,7 +130,9 @@ const CustomStepper = () => {
   React.useEffect(() => console.log(reservas), [reservas]);
 
   const crearReservas = () => {
-    reservas.forEach(createReserva);
+    createReservas(reservas);
+    cambiarEstadosHabitaciones(reservas.map(r => r.habitacion));
+    handleNext();
   };
 
   const handleNext = () => {
@@ -130,6 +146,7 @@ const CustomStepper = () => {
   const handleReset = () => {
     setActiveStep(0);
     reset();
+    resetPostReservas();
   };
 
   return (
@@ -176,9 +193,14 @@ const CustomStepper = () => {
       </Stepper>
       {activeStep === steps.length ? (
         <>
-          <Typography sx={{}}>
-            All steps completed - you&apos;re finished
-          </Typography>
+          {postReservas ? (
+            <ResumenReservas
+              reservas={postReservas}
+              cliente={reserva.cliente || ({} as ICliente)}
+            />
+          ) : (
+            <CircularProgress color="primary" />
+          )}
           <Box
             sx={{
               display: "flex",
@@ -186,20 +208,14 @@ const CustomStepper = () => {
               justifyContent: "space-between",
             }}
           >
-            <Button onClick={handleReset}>Nuevo</Button>
+            <Button onClick={handleReset}>Crear nueva reserva</Button>
           </Box>
         </>
       ) : (
         <>
-          <Box sx={{ flex: 1, display: activeStep === 0 ? "block" : "none" }}>
-            <Clientes />
-          </Box>
-          <Box sx={{ flex: 1, display: activeStep === 1 ? "block" : "none" }}>
-            <Habitaciones />
-          </Box>
-          <Box sx={{ flex: 1, display: activeStep === 2 ? "block" : "none" }}>
-            <TerminarReserva />
-          </Box>
+          {activeStep === 0 && <Clientes />}
+          {activeStep === 1 && <Habitaciones />}
+          {activeStep === 2 && <TerminarReserva />}
           <Box
             sx={{
               display: "flex",
@@ -254,4 +270,107 @@ function isOk(activeStep: number, reserva: Reserva): boolean {
       return true;
   }
 }
+
+interface ResumenReservasProps {
+  reservas: ReservaResponse[];
+  cliente: ICliente;
+}
+
+const ResumenReservas = (props: ResumenReservasProps) => {
+  const { cliente } = props;
+  const [reservas, setReservas] = React.useState<ReservaResponse[]>(
+    props.reservas
+  );
+  const theme = useTheme();
+
+  React.useEffect(() => {
+    setReservas(props.reservas);
+  }, [props.reservas]);
+
+  return (
+    <Stack spacing={2} sx={{ flex: 1 }}>
+      <Typography variant="h5" component="h3" color="primary.main">
+        Resumen
+      </Typography>
+      <Divider variant="fullWidth" />
+      <Stack
+        justifyContent="space-around"
+        direction={{ xs: "column", lg: "row" }}
+        alignItems={{ xs: "stretch", lg: "flex-start" }}
+        spacing={2}
+      >
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          spacing={2}
+          direction={{ xs: "column", sm: "row", lg: "column" }}
+        >
+          <Avatar sx={{ bgcolor: "primary.main" }}>
+            {cliente.nombre[0].toUpperCase()}
+          </Avatar>
+          <Stack
+            alignItems="center"
+            spacing={1}
+            sx={{
+              boxShadow: `inset 0px -2px 5px ${theme.palette.grey[900]}`,
+              borderRadius: "20px",
+              padding: 2,
+            }}
+          >
+            {Object.entries(cliente).map(([key, value]) => {
+              return (
+                <Box key={key}>
+                  {key.toUpperCase()}: {value}
+                </Box>
+              );
+            })}
+          </Stack>
+        </Stack>
+        <Stack
+          className="hide-scrollbar"
+          sx={{
+            maxHeight: "400px",
+            overflow: "scroll",
+          }}
+        >
+          {reservas.length &&
+            reservas?.map(reserva => (
+              <Stack key={reserva?.no_reserva} spacing={0.5}>
+                <Stack
+                  spacing={{ xs: 0.5, sm: 2 }}
+                  direction={{ xs: "column", sm: "row" }}
+                  alignItems="center"
+                  justifyContent={{ xs: "flex-start", sm: "space-between" }}
+                >
+                  <Typography
+                    textAlign={{ xs: "center", sm: "left" }}
+                    variant="h6"
+                    component="h4"
+                    color="primary.main"
+                  >
+                    Reserva #{reserva?.no_reserva}
+                  </Typography>
+                  <Stack direction="row" spacing={2}>
+                    <Typography component="span">
+                      {moment(reserva?.fecha_entrada)
+                        .add(5, "hours")
+                        .format("DD/MM/YYYY, HH:mm")}
+                    </Typography>
+                    <Typography component="span" color="secondary.main">
+                      {reserva?.numero_noches}{" "}
+                      {reserva?.numero_noches === 1 ? "noche" : "noches"}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <Typography textAlign="center" color="text.primary">
+                  Habitacion No.{reserva?.habitacion}
+                </Typography>
+                <Divider />
+              </Stack>
+            ))}
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+};
 export default CustomStepper;

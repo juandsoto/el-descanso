@@ -7,30 +7,25 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Typography,
   TextField,
   Stack,
   Checkbox,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { IUsuario } from "../interfaces/Usuario";
+import IUsuario from "../interfaces/Usuario";
 import React from "react";
 import EditDrawer from "./EditDrawer";
 import ConfirmDialog from "./ConfirmDialog";
 import { useTheme } from "@mui/material/styles";
 import ICliente from "../interfaces/Cliente";
-import { useAuth } from "../context/auth";
 import { useReserva } from "../context/reserva/index";
-import IReserva from "../interfaces/Reserva";
 import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { formatCurrency } from "../utils/index";
 
 interface TableProps<T> {
   title: string;
   rows: Omit<T, "password">[];
-  // setRows: (rows: T[]) => void;
   type: "usuario" | "cliente";
   fullWidth?: boolean;
   initialSelected: Omit<T, "password">;
@@ -38,7 +33,7 @@ interface TableProps<T> {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   onChangeSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCreate: (item: T) => void;
-  onUpdate: (item: Partial<T>) => void;
+  onUpdate: (item: T) => void;
   onDelete: (id: string) => void;
 }
 
@@ -66,9 +61,10 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
   const [selected, setSelected] = React.useState<Omit<T, "password">>(
     props.initialSelected
   );
-  const { user } = useAuth();
   const theme = useTheme();
   const location = useLocation();
+
+  console.log("render table");
 
   const inAdminPanel = location.pathname.split("/")[2] === "administrador";
 
@@ -122,24 +118,24 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
             id="standard-basic"
             label="Buscar..."
             variant="standard"
-            // value={props.search}
             onChange={props.onChangeSearch}
             inputProps={{ "aria-label": "controlled" }}
           />
         </Stack>
         <TableContainer
-          // className="hide-scrollbar_xs"
           className="hide-scrollbar"
-          component={Paper}
           sx={{
             width: `${props.fullWidth ? "100%" : "80%"}`,
-            maxHeight: "400px",
+            height: "400px",
             boxShadow: `2px 2px 7px ${theme.palette.grey[900]}`,
           }}
         >
           <MuiTable
             stickyHeader
-            sx={{ minWidth: 650, bgcolor: "background.default" }}
+            sx={{
+              minWidth: 650,
+              bgcolor: "background.default",
+            }}
             aria-label="simple table"
           >
             <TableHead>
@@ -170,7 +166,7 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
                 {!props.rows.length ? (
                   <TableRow
                     sx={{
-                      // "&:last-child td, &:last-child th": { border: 0 },
+                      "&:last-child td, &:last-child th": { border: 0 },
                       width: "100%",
                       textAlign: "center",
                     }}
@@ -221,7 +217,7 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
                           <>
                             <TableCell align="center">
                               <Button
-                                variant="outlined"
+                                variant="text"
                                 color="primary"
                                 onClick={() => {
                                   setSelected(row);
@@ -233,7 +229,7 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
                             </TableCell>
                             <TableCell align="center">
                               <Button
-                                variant="outlined"
+                                variant="text"
                                 color="error"
                                 onClick={() => {
                                   setSelected(row);
@@ -263,7 +259,6 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
         onConfirm={(row: T) => {
           setIsCreating(false);
           props.onCreate(row);
-          // props.setRows([row, ...props.rows]);
         }}
       />
       {inAdminPanel && (
@@ -276,8 +271,6 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
             onConfirm={(row: T) => {
               setIsEditing(false);
               props.onUpdate(row);
-
-              // props.setRows(props.rows.map(r => (r.id === row.id ? row : r)));
             }}
           />
           <ConfirmDialog
@@ -286,13 +279,10 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
             dialogInfo={{
               title: `Eliminar ${props.type}`,
               description: `¿Está seguro que desea eliminar este ${props.type}?`,
-              item: selected,
               onCancel: () => setIsDeleting(false),
-              onConfirm: (row: Partial<Omit<T, "password">>) => {
+              onConfirm: () => {
                 setIsDeleting(false);
-                props.onDelete(row.id ?? "");
-
-                // props.setRows(props.rows.filter(r => r.id !== row.id));
+                props.onDelete(selected.id ?? "");
               },
             }}
           />
@@ -308,8 +298,10 @@ interface CheckClienteProps {
 
 const CheckCliente = (props: CheckClienteProps): JSX.Element => {
   const { reserva, setReserva } = useReserva();
+  const [checked, setChecked] = React.useState<boolean>(false);
 
   const onChange = () => {
+    setChecked(prev => !prev);
     setReserva(prev => ({
       ...prev,
       cliente: prev.cliente ? null : props.cliente,
@@ -328,7 +320,7 @@ const CheckCliente = (props: CheckClienteProps): JSX.Element => {
         !reserva.cliente
           ? false
           : reserva.cliente.no_identificacion ===
-            props.cliente.no_identificacion
+              props.cliente.no_identificacion || checked
       }
       onChange={onChange}
       inputProps={{ "aria-label": "controlled" }}

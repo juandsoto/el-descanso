@@ -14,21 +14,30 @@ import PersonIcon from "@mui/icons-material/Person";
 import useForm from "../hooks/useForm";
 import ISolicitud from "../interfaces/Solicitud";
 import toast from "react-hot-toast";
+import useAxios from "../hooks/useAxios";
 
 const ReservarFormulario = (): JSX.Element => {
-  const [send, setSend] = React.useState(false);
   const theme = useTheme();
-  const { form, handleChange, reset } = useForm<Omit<ISolicitud, "id">>({
-    correo: "",
+  const [_, postData] = useAxios(
+    {
+      url: "/solicitud/",
+      method: "POST",
+    },
+    { manual: true }
+  );
+  const { form, handleChange, reset } = useForm<
+    Omit<ISolicitud, "id" | "estado">
+  >({
+    email: "",
     nombre: "",
     telefono: "",
-    estado: "",
   });
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSend(true);
-    console.log(form);
+    postData({
+      data: form,
+    });
     reset();
     toast.success(
       "¡Genial! Hemos recibido tu solicitud. Pronto te llamaremos",
@@ -45,7 +54,7 @@ const ReservarFormulario = (): JSX.Element => {
       flexWrap="wrap"
       alignItems="center"
       minHeight="100vh"
-      pb={1}
+      p={1}
       sx={{
         position: "relative",
         background: `linear-gradient(180deg, ${theme.palette.background.default} 50%, rgba(12,176,169,1) 80%)`,
@@ -58,23 +67,19 @@ const ReservarFormulario = (): JSX.Element => {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        p={6}
+        p={4}
         borderRadius="20px"
-        bgcolor={theme.palette.background.default}
+        bgcolor="background.default"
         boxShadow="0px 10px 31px 13px rgba(0,0,0,0.1)"
       >
-        <Typography
-          variant="h4"
-          component="h2"
-          color={theme.palette.primary.main}
-        >
+        <Typography variant="h4" component="h2" color="primary.main">
           Reservar
         </Typography>
         <Typography
           component="p"
           textAlign="center"
           mt={2}
-          color={theme.palette.text.primary}
+          color="text.primary"
         >
           Envíanos tu correo y tu número de telefono para contactarte
         </Typography>
@@ -103,10 +108,10 @@ const ReservarFormulario = (): JSX.Element => {
             variant="standard"
             required
             fullWidth
-            id="correo"
+            id="email"
             label="Correo"
-            name="correo"
-            value={form.correo}
+            name="email"
+            value={form.email}
             onChange={handleChange}
             autoComplete="email"
             InputProps={{
@@ -136,6 +141,14 @@ const ReservarFormulario = (): JSX.Element => {
               ),
             }}
           />
+          <Typography
+            component="p"
+            textAlign="center"
+            mt={2}
+            color="text.primary"
+          >
+            ó llamanos al +57 3173461739
+          </Typography>
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3 }}>
             Enviar
           </Button>

@@ -1,8 +1,7 @@
 import React from "react";
+import { Box, Stack, Typography, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useAuth } from "../context/auth/index";
-import { Stack, Typography, Tooltip } from "@mui/material";
-import Box from "@mui/material/Box";
 import EditDialog from "./EditDialog";
 
 interface DescuentoProps {
@@ -12,8 +11,6 @@ interface DescuentoProps {
 const Descuento = (props: DescuentoProps): JSX.Element => {
   const [value, setValue] = React.useState<number>(5);
   const [openDialog, setOpenDialog] = React.useState<boolean>(false);
-
-  const theme = useTheme();
   const { user } = useAuth();
 
   return (

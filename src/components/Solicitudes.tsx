@@ -10,98 +10,62 @@ import {
   Paper,
   Typography,
   Stack,
-  Tooltip,
   useTheme,
 } from "@mui/material";
-
-import useFilter from "../hooks/useFilter";
-import Filtro from "./Filtro";
 import CheckIcon from "@mui/icons-material/Check";
 import { AnimatePresence, motion } from "framer-motion";
-
-const hardSolicitudes: ISolicitud[] = [
-  {
-    id: "1",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "2",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "3",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "4",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "5",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "6",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "7",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "8",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-  {
-    id: "9",
-    nombre: "juan",
-    telefono: "123456789",
-    correo: "juan@test.com",
-    estado: "pendiente",
-  },
-];
+import useAxios from "../hooks/useAxios";
+import { useAuth } from "../context/auth/index";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const SOLICITUD: ISolicitud = {
-  id: "",
+  id: 0,
+  email: "",
   nombre: "",
   telefono: "",
-  correo: "",
   estado: "",
 };
 
 const Solicitudes = () => {
-  const [solicitudes, setSolicitudes] =
-    React.useState<ISolicitud[]>(hardSolicitudes);
+  const { user } = useAuth();
+
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${user.token}`,
+  };
+
+  const [{ data: solicitudes, loading }] = useAxios<{
+    solicitudes: ISolicitud[];
+  }>({
+    url: "/solicitudfilter/?estado=pendiente",
+    headers,
+  });
+  const [state, setState] = React.useState<ISolicitud[]>([]);
+
+  React.useEffect(() => {
+    setState(solicitudes?.solicitudes ?? []);
+  }, [solicitudes]);
+
+  const [{ data: _, loading: loadingPatch }, patchData] = useAxios<
+    ISolicitud,
+    Pick<ISolicitud, "estado">
+  >(
+    {
+      method: "PATCH",
+      headers,
+    },
+    { manual: true }
+  );
+
   const theme = useTheme();
 
-  const onSetSolicitud = (id: string) => {
-    //TODO: enviar solicitud a backend
-    const index = solicitudes.findIndex(solicitud => solicitud.id === id);
-    setSolicitudes(prev => prev.filter(s => s.id !== id));
+  const onSetSolicitud = (id: number) => {
+    patchData({
+      url: `/solicitud/${id}/`,
+      data: {
+        estado: "atendida",
+      },
+    });
+    setState(prev => prev.filter(s => s.id !== id));
   };
 
   return (
@@ -124,10 +88,9 @@ const Solicitudes = () => {
       <TableContainer
         // className="hide-scrollbar_xs"
         className="hide-scrollbar"
-        component={Paper}
         sx={{
           width: "100%",
-          maxHeight: "250px",
+          height: "300px",
           boxShadow: `2px 2px 7px ${theme.palette.grey[900]}`,
         }}
       >
@@ -138,7 +101,7 @@ const Solicitudes = () => {
         >
           <TableHead>
             <TableRow>
-              {Object.keys(SOLICITUD).map((column, index) => (
+              {Object.keys(state[0] || SOLICITUD).map((column, index) => (
                 <TableCell
                   key={index}
                   align="center"
@@ -154,24 +117,34 @@ const Solicitudes = () => {
           </TableHead>
           <TableBody>
             <AnimatePresence initial={false}>
-              {!solicitudes.length ? (
+              {!state?.length ? (
                 <TableRow
                   sx={{
-                    // "&:last-child td, &:last-child th": { border: 0 },
+                    "&:last-child td, &:last-child th": { border: 0 },
                     width: "100%",
                     textAlign: "center",
                   }}
                 >
-                  <TableCell
-                    align="center"
-                    colSpan={6}
-                    sx={{ color: "error.main" }}
-                  >
-                    No existen solicitudes
-                  </TableCell>
+                  {loading ? (
+                    <TableCell
+                      align="center"
+                      colSpan={6}
+                      sx={{ color: "error.main" }}
+                    >
+                      <CircularProgress color="primary" size={25} />
+                    </TableCell>
+                  ) : (
+                    <TableCell
+                      align="center"
+                      colSpan={6}
+                      sx={{ color: "error.main" }}
+                    >
+                      No existen solicitudes
+                    </TableCell>
+                  )}
                 </TableRow>
               ) : (
-                solicitudes.map(solicitud => (
+                state?.map(solicitud => (
                   <TableRow
                     component={motion.tr}
                     layout

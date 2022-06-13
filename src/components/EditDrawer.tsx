@@ -1,6 +1,6 @@
 import { Drawer, useMediaQuery, useTheme } from "@mui/material";
 import ICliente from "../interfaces/Cliente";
-import { IUsuario } from "../interfaces/Usuario";
+import IUsuario from "../interfaces/Usuario";
 import Form from "./Form";
 
 interface EditDrawerProps<T> {
@@ -24,7 +24,7 @@ const EditDrawer = <T extends Partial<IUsuario & ICliente>>(
         type={props.type}
         creating={props.creating}
         onConfirm={props.onConfirm}
-        width={isSmallScreen ? "80vw" : "30vw"}
+        width={isSmallScreen ? "80vw" : "40vw"}
         editing={props.editing}
         handleClose={props.handleClose}
       />

@@ -1,10 +1,10 @@
-import { Button } from "@mui/material";
 import ReactPDF from "@react-pdf/renderer";
-const { Image, Document, Page, Text, Font, View } = ReactPDF;
-import { useTheme } from "@mui/material/styles";
-import styles from "../pdfStyles";
-import React from "react";
+const { Image, Document, Page, Text, View } = ReactPDF;
 
+const MyDocument: any = Document;
+const MyPage: any = Page;
+
+import styles from "../pdfStyles";
 interface InformeProps {
   data: {
     title: string;
@@ -14,28 +14,18 @@ interface InformeProps {
 
 const Informe = (props: InformeProps) => {
   const { data, children } = props;
-  const theme = useTheme();
   return (
-    <Document>
-      <Page style={styles.body}>
-        <Image style={styles.logo} src="/src/assets/images/logopdf.jpg" />
+    <MyDocument>
+      <MyPage style={styles.body}>
+        <Image style={styles.logo} src="/src/assets/images/logopdf.jpg" fixed />
 
         <View>
           <Text style={styles.header}>el descanso</Text>
-          <Text style={styles.title} fixed>
-            {data.title}
-          </Text>
-          {/* <Text
-            style={styles.pageNumber}
-            render={({ pageNumber, totalPages }) =>
-              `${pageNumber} / ${totalPages}`
-            }
-            fixed
-          /> */}
+          <Text style={styles.title}>{data.title}</Text>
           {children}
         </View>
-      </Page>
-    </Document>
+      </MyPage>
+    </MyDocument>
   );
 };
 

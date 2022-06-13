@@ -1,11 +1,7 @@
 import Table from "./Table";
-import { IUsuario } from "../interfaces/Usuario";
+import IUsuario from "../interfaces/Usuario";
 import React from "react";
-import useAxios from "../hooks/useAxios";
-import toast from "react-hot-toast";
-import { useAuth } from "../context/auth/index";
 import useUsuarios from "../hooks/useUsuarios";
-import { useAppContext } from "../context/index";
 import { debounce } from "lodash";
 
 const initialSelected: IUsuario = {
@@ -18,7 +14,10 @@ const initialSelected: IUsuario = {
 };
 
 const Usuarios = (): JSX.Element => {
-  const { usuarios, createUser, updateUser, deleteUser } = useUsuarios();
+  const { usuarios: data, createUser, updateUser, deleteUser } = useUsuarios();
+  const [usuarios, setUsuarios] = React.useState<Omit<IUsuario, "password">[]>(
+    []
+  );
   const [search, setSearch] = React.useState<string>("");
   const filtroUsuarios = React.useMemo(
     () =>
@@ -38,6 +37,31 @@ const Usuarios = (): JSX.Element => {
     [usuarios, search]
   );
 
+  const onCreate = (data: IUsuario) => {
+    const { password, ...usuario } = data;
+    setUsuarios(prev => [usuario, ...prev]);
+    createUser(data);
+  };
+
+  const onUpdate = (data: IUsuario) => {
+    const { password, ...usuario } = data;
+    setUsuarios(prev => prev.map(u => (u.id === usuario.id ? usuario : u)));
+    if (password.length) {
+      updateUser(data);
+      return;
+    }
+    updateUser(usuario);
+  };
+
+  const onDelete = (id: string) => {
+    setUsuarios(prev => prev.filter(u => u.id !== id));
+    deleteUser(id);
+  };
+
+  React.useEffect(() => {
+    data && setUsuarios(data);
+  }, [data]);
+
   const onChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearch(e.target.value);
 
@@ -52,9 +76,9 @@ const Usuarios = (): JSX.Element => {
       setSearch={setSearch}
       onChangeSearch={debounceOnChange}
       initialSelected={initialSelected}
-      onCreate={createUser}
-      onUpdate={updateUser}
-      onDelete={deleteUser}
+      onCreate={onCreate}
+      onUpdate={onUpdate}
+      onDelete={onDelete}
     />
   );
 };

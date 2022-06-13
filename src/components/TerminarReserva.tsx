@@ -8,13 +8,11 @@ import {
   Stack,
 } from "@mui/material";
 import { additionalReserva, useReserva } from "../context/reserva/index";
-import IReserva from "../interfaces/Reserva";
 import IHabitacion from "../interfaces/Habitacion";
 import { formatCurrency } from "../utils";
 import { useTheme } from "@mui/material/styles";
 import moment from "moment";
 import { motion } from "framer-motion";
-import IReservaBody from "../interfaces/api/ReservaBody";
 
 const TerminarReserva = () => {
   const { reserva } = useReserva();
@@ -35,7 +33,7 @@ const TerminarReserva = () => {
   );
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={{ flex: 1 }}>
       <Typography variant="h5" component="h3" color="primary.main">
         Terminar reserva
       </Typography>
@@ -45,6 +43,7 @@ const TerminarReserva = () => {
         justifyContent="space-around"
         alignItems={{ xs: "stretch", lg: "flex-start" }}
         spacing={2}
+        sx={{ flex: 1 }}
       >
         <Stack
           alignItems="center"
@@ -183,11 +182,9 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
             InputLabelProps={{
               shrink: true,
             }}
-            inputProps={
-              {
-                // min: moment(new Date()).format("YYYY-MM-DD[T]HH:mm:ss"),
-              }
-            }
+            inputProps={{
+              min: moment().format("YYYY-MM-DD[T]HH:mm:ss"),
+            }}
             name="fecha_entrada"
             value={props.habitacion.fecha_entrada ?? ""}
             onChange={onChange}
@@ -212,9 +209,6 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
         </Stack>
       </Stack>
       <Divider variant="fullWidth" sx={{ marginY: 0.5 }} />
-      {/* <Box sx={{ minHeight: "20vh", bgcolor: "primary", zIndex: 99 }}>
-        <Datetime />
-      </Box> */}
     </>
   );
 };

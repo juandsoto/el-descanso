@@ -2,8 +2,6 @@ import { Stack, Button, Container, Link, useTheme } from "@mui/material";
 import Logo from "./Logo";
 
 const Navbar = (): JSX.Element => {
-  const theme = useTheme();
-
   return (
     <Container
       component="nav"
@@ -46,10 +44,10 @@ const Navbar = (): JSX.Element => {
           href="#reservar"
           sx={{
             display: { xs: "none", sm: "block" },
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.text.primary,
+            backgroundColor: "primary.main",
+            color: "text.primary",
             "&:hover": {
-              backgroundColor: theme.palette.primary.main,
+              backgroundColor: "primary.main",
             },
           }}
         >

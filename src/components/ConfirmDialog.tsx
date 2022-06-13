@@ -8,16 +8,15 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { IUsuario } from "../interfaces/Usuario";
+import IUsuario from "../interfaces/Usuario";
 import ICliente from "../interfaces/Cliente";
 import React from "react";
 
 interface DialogInfo<T> {
   title: string;
-  item: Partial<Omit<T, "password">>;
   description: string;
   onCancel: () => void;
-  onConfirm: (row: Partial<Omit<T, "password">>) => void;
+  onConfirm: () => void;
 }
 interface ConfirmDialogProps<T> {
   open: boolean;
@@ -32,7 +31,7 @@ const ConfirmDialog = <T extends Partial<IUsuario & ICliente>>(
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    props.dialogInfo.onConfirm(props.dialogInfo.item);
+    props.dialogInfo.onConfirm();
   };
 
   return (

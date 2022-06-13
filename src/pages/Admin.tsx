@@ -12,7 +12,6 @@ import {
 } from "../components";
 
 const Admin = () => {
-  const theme = useTheme();
   return (
     <UserLayout>
       <UserLayoutLeft />
@@ -22,7 +21,7 @@ const Admin = () => {
             display: "flex",
             flexDirection: "column",
             gap: "2rem",
-            color: theme.palette.text.primary,
+            color: "text.primary",
           }}
         >
           <Estadisticas />

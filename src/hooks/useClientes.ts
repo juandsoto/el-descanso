@@ -5,7 +5,6 @@ import useAxios from "../hooks/useAxios";
 import toast from "react-hot-toast";
 
 const useClientes = () => {
-  const [state, setState] = React.useState<ICliente[]>();
   const { user } = useAuth();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${user.token}`,
@@ -59,36 +58,32 @@ const useClientes = () => {
   const updateClient = (cliente: Partial<ICliente>) => {
     patchClient({
       data: cliente,
-      url: `/client/${cliente.no_identificacion}/`,
+      url: `/cliente/${cliente.no_identificacion}/`,
     });
   };
   const deleteClientById = (id: string) => {
     patchClient({
-      url: `/client/${id}`,
+      url: `/cliente/${id}`,
     });
   };
 
   React.useEffect(() => {
-    if (!clientes?.length) return;
-    setState(clientes);
-  }, [clientes]);
-
-  React.useEffect(() => {
     if (!postResponse) return;
     toast.success(postResponse.detail);
-    setState(prev => [
-      {
-        no_identificacion: "0",
-        nombre: "hard",
-        telefono: "123456789",
-        correo: "hard@hard.com",
-      },
-      ...prev!,
-    ]);
   }, [postResponse]);
 
+  React.useEffect(() => {
+    if (!patchResponse) return;
+    toast.success("Cliente actualizado con éxito!");
+  }, [patchResponse]);
+
+  React.useEffect(() => {
+    if (!deleteResponse) return;
+    toast.success("Cliente eliminado con éxito!");
+  }, [deleteResponse]);
+
   return {
-    clientes: state,
+    clientes,
     createClient,
     updateClient,
     deleteClient: deleteClientById,

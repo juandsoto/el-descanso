@@ -8,11 +8,6 @@ const ChartLayout = ({
   children: JSX.Element | JSX.Element[];
 }): JSX.Element => {
   const [fecha, setFecha] = React.useState<Date>(new Date());
-
-  //TODO: API call moment(fecha.getTime() + 1000 * 60 * 60 * 6).format("yyyy-MM")
-  // React.useEffect(() => {
-  // },[fecha])
-
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFecha(new Date(e.target.value));
   };
@@ -38,7 +33,7 @@ const ChartLayout = ({
             shrink: true,
           }}
           inputProps={{
-            max: moment(new Date()).format("yyyy-MM"),
+            max: moment().format("yyyy-MM"),
           }}
           name="fecha_entrada"
           value={fecha}

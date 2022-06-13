@@ -4,18 +4,18 @@ import { useAuth } from "../context/auth/index";
 import useAxios from "../hooks/useAxios";
 import toast from "react-hot-toast";
 import IReservaBody from "../interfaces/api/ReservaBody";
+import IReservaPostResponse, {
+  ReservaResponse,
+} from "../interfaces/api/ReservaPostResponse";
 
 const useReservas = () => {
   const [state, setState] = React.useState<IReserva[]>();
+  const [postReservas, setPostReservas] = React.useState<ReservaResponse[]>([]);
+  const [reservasLeft, setReservasLeft] = React.useState<IReservaBody[]>([]);
   const { user } = useAuth();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${user.token}`,
   };
-
-  // const [{ data: reservas, loading, error }] = useAxios<IReserva[]>({
-  //   url: "/reservas/",
-  //   headers,
-  // });
 
   const [
     {
@@ -49,7 +49,7 @@ const useReservas = () => {
   const [
     { data: postResponse, loading: postLoading, error: postError },
     postReserva,
-  ] = useAxios<{ detail: string }, IReservaBody>(
+  ] = useAxios<IReservaPostResponse, IReservaBody>(
     {
       url: "/reserva/",
       method: "POST",
@@ -58,35 +58,29 @@ const useReservas = () => {
     { manual: true, autoCancel: false }
   );
 
-  // const [
-  //   { data: patchResponse, loading: patchLoading, error: patchError },
-  //   patchClient,
-  // ] = useAxios<IReserva, Partial<IReserva>>(
-  //   {
-  //     url: "/cliente/",
-  //     method: "PATCH",
-  //     headers,
-  //   },
-  //   { manual: true }
-  // );
-  // const [
-  //   { data: deleteResponse, loading: deleteLoading, error: deleteError },
-  //   deleteClient,
-  // ] = useAxios<{ detail: string }, Partial<IReserva>>(
-  //   {
-  //     url: "/cliente/",
-  //     method: "DELETE",
-  //     headers,
-  //   },
-  //   { manual: true }
-  // );
+  const [
+    { data: patchResponse, loading: patchLoading, error: patchError },
+    patchReserva,
+  ] = useAxios<IReserva, { cancelada: boolean }>(
+    {
+      method: "PATCH",
+      headers,
+    },
+    { manual: true }
+  );
+
+  const reset = () => {
+    setState([]);
+  };
 
   const getReservasById = (id: number) => {
+    reset();
     getById({
       url: `/reserva/${id}/`,
     });
   };
   const getReservasByClientId = (id: string) => {
+    reset();
     getByClientId({
       url: `/reservacliente/?cliente=${id}`,
     });
@@ -96,17 +90,26 @@ const useReservas = () => {
       data: reserva,
     });
   };
-  // const updateClient = (cliente: Partial<IReserva>) => {
-  //   patchClient({
-  //     data: cliente,
-  //     url: `/client/${cliente.no_identificacion}/`,
-  //   });
-  // };
-  // const deleteClientById = (id: string) => {
-  //   patchClient({
-  //     url: `/client/${id}`,
-  //   });
-  // };
+  const createReservas = (reservas: IReservaBody[]) => {
+    setReservasLeft(reservas);
+  };
+
+  const cancelarReserva = (id: number) => {
+    patchReserva({
+      url: `/reserva/${id}/`,
+      data: {
+        cancelada: true,
+      },
+    });
+  };
+
+  const checkinReserva = (id: number) => {};
+
+  React.useEffect(() => {
+    if (!reservasLeft.length) return;
+    createReserva(reservasLeft[0]);
+    setReservasLeft(reservasLeft.slice(1));
+  }, [reservasLeft]);
 
   React.useEffect(() => {
     if (!reservasById) return;
@@ -129,15 +132,25 @@ const useReservas = () => {
 
   React.useEffect(() => {
     if (!postResponse) return;
+    console.log(postResponse);
+    setPostReservas(prev => [...prev, postResponse.reserva]);
     toast.success("Reserva creada exitosamente!");
   }, [postResponse]);
 
   return {
     reservas: state,
+    loading: reservasByIdLoading || reservasByClientIdLoading,
+    reset,
+    reservasByIdError,
+    reservasByClientIdError,
+    postReservas,
     reservasByClientIdLoading,
     getReservasById,
     getReservasByClientId,
     createReserva,
+    createReservas,
+    cancelarReserva,
+    checkinReserva,
     // updateClient,
     // deleteClient: deleteClientById,
   };

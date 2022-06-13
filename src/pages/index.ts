@@ -1,9 +1,5 @@
 export { default as Home } from "./Home";
 export { default as Login } from "./Login";
-export { default as ReservaDetail } from "./ReservaDetail";
-export { default as HabitacionDetail } from "./HabitacionDetail";
-export { default as ServicioDetail } from "./ServicioDetail";
-export { default as Estadisticas } from "../components/Estadisticas";
 export { default as Admin } from "./Admin";
 export { default as Recepcionista } from "./Recepcionista";
 export { default as Gerente } from "./Gerente";

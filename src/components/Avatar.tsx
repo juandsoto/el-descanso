@@ -1,5 +1,4 @@
 import { Button, Stack, Typography } from "@mui/material";
-import React from "react";
 import { useAuth } from "../context/auth/index";
 
 const Avatar = (): JSX.Element => {

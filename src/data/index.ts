@@ -18,8 +18,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import IHabitacion from "../interfaces/Habitacion";
-import IReserva from "../interfaces/Reserva";
 import IAvailableServices from "../interfaces/AvailableServices";
 import { NombreTipoHabitacion } from "../interfaces/TipoHabitacion";
 
@@ -133,15 +131,15 @@ export const usoDeServicios = {
 };
 
 export const diasLabels = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
+  "01",
+  "02",
+  "03",
+  "04",
+  "05",
+  "06",
+  "07",
+  "08",
+  "09",
   "10",
   "11",
   "12",
@@ -292,135 +290,6 @@ export const ventasMensualesPorServicio = {
     ],
   },
 };
-
-export const hardHabitaciones: IHabitacion[] = [
-  {
-    no_habitacion: 1,
-    estado: "disponible",
-    tipo: "sencilla",
-    precio: 150000,
-  },
-  {
-    no_habitacion: 2,
-    estado: "reservada",
-    tipo: "doble",
-    precio: 200000,
-  },
-  {
-    no_habitacion: 3,
-    estado: "ocupada",
-    tipo: "doble",
-    precio: 200000,
-  },
-  {
-    no_habitacion: 4,
-    estado: "disponible",
-    tipo: "matrimonial",
-    precio: 250000,
-  },
-  {
-    no_habitacion: 5,
-    estado: "disponible",
-    tipo: "matrimonial",
-    precio: 250000,
-  },
-  {
-    no_habitacion: 6,
-    estado: "reservada",
-    tipo: "suite sencilla",
-    precio: 300000,
-  },
-  {
-    no_habitacion: 7,
-    estado: "disponible",
-    tipo: "suite presidencial",
-    precio: 350000,
-  },
-  {
-    no_habitacion: 9,
-    estado: "disponible",
-    tipo: "suite presidencial",
-    precio: 350000,
-  },
-  {
-    no_habitacion: 10,
-    estado: "disponible",
-    tipo: "suite presidencial",
-    precio: 350000,
-  },
-  {
-    no_habitacion: 11,
-    estado: "disponible",
-    tipo: "suite presidencial",
-    precio: 350000,
-  },
-  {
-    no_habitacion: 12,
-    estado: "disponible",
-    tipo: "suite presidencial",
-    precio: 350000,
-  },
-  {
-    no_habitacion: 8,
-    estado: "ocupada",
-    tipo: "matrimonial",
-    precio: 250000,
-  },
-];
-
-export const hardReservas: IReserva[] = [
-  {
-    no_reserva: "1",
-    fecha_entrada: new Date(),
-    numero_noches: 3,
-    cliente: {
-      no_identificacion: "1",
-      nombre: "juan",
-      correo: "juan@test.com",
-      telefono: "123456789",
-    },
-    habitacion: {
-      no_habitacion: 1,
-      precio: 200000,
-      estado: "reservada",
-      tipo: "sencilla",
-    },
-  },
-  {
-    no_reserva: "3",
-    fecha_entrada: new Date(),
-    numero_noches: 1,
-    cliente: {
-      no_identificacion: "1",
-      nombre: "juan",
-      correo: "juan@test.com",
-      telefono: "123456789",
-    },
-    habitacion: {
-      no_habitacion: 3,
-      precio: 400000,
-      estado: "reservada",
-      tipo: "suite presidencial",
-    },
-  },
-  {
-    no_reserva: "2",
-    fecha_entrada: new Date(),
-    numero_noches: 4,
-    cliente: {
-      no_identificacion: "2",
-      nombre: "juan",
-      correo: "juan@test.com",
-      telefono: "123456789",
-    },
-    habitacion: {
-      no_habitacion: 2,
-      precio: 350000,
-      estado: "reservada",
-      tipo: "matrimonial",
-    },
-  },
-];
 
 export const availableServices: IAvailableServices[] = [
   {

@@ -14,6 +14,7 @@ import {
   Typography,
   useTheme,
   CircularProgress,
+  InputAdornment,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useAuth } from "../context/auth/index";
@@ -24,6 +25,8 @@ import useAxios from "../hooks/useAxios";
 import { ILoginResponse } from "../interfaces/api/LoginResponse";
 import { Rol } from "../interfaces/Usuario";
 import toast from "react-hot-toast";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const Copyright = (props: any): JSX.Element => {
   return (
@@ -38,6 +41,7 @@ const Copyright = (props: any): JSX.Element => {
 const Login = (): JSX.Element => {
   const { setUser } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const { form, handleChange } = useForm<ILogin>({
     username: "",
     password: "",
@@ -57,6 +61,10 @@ const Login = (): JSX.Element => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!form.password.length || !form.username.length) {
+      toast.error("Todos los campos son obligatorios");
+      return;
+    }
     login({
       data: form,
     });
@@ -71,6 +79,10 @@ const Login = (): JSX.Element => {
       replace: true,
     });
   }, [response]);
+
+  React.useEffect(() => {
+    error && toast.error(error?.response?.data.Error);
+  }, [error]);
 
   return (
     <>
@@ -135,11 +147,26 @@ const Login = (): JSX.Element => {
                 fullWidth
                 name="password"
                 label="Contraseña"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="contraseña"
                 autoComplete="current-password"
                 value={form.password}
                 onChange={handleChange}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment
+                      position="end"
+                      onClick={() => setShowPassword(prev => !prev)}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
+                    </InputAdornment>
+                  ),
+                }}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}

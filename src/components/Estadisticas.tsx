@@ -1,18 +1,4 @@
-import {
-  Tooltip as MuiTooltip,
-  Box,
-  Grid,
-  Stack,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import React from "react";
-import ChartLayout from "./ChartLayout";
-import EditDialog from "./EditDialog";
-import { ocupacionHotel, usoDeServicios, ventasMensuales } from "../data";
-import { Bar, Line, Doughnut } from "react-chartjs-2";
-import { useAuth } from "../context/auth/index";
-import { ventasMensualesPorServicio } from "../data/index";
+import { Grid, Stack } from "@mui/material";
 import OcupacionHotelChart from "./OcupacionHotelChart";
 import UsoDeServiciosChart from "./UsoDeServiciosChart";
 import CancelacionDeReservas from "./CancelacionDeReservas";
@@ -21,14 +7,6 @@ import VentasMensualesChart from "./VentasMensualesChart";
 import Descuento from "./Descuento";
 
 const Estadisticas = (): JSX.Element => {
-  // const ref = React.useRef<ForwardedRef<ChartJSOrUndefined<"bar", number[], string>>>();
-
-  // const download = React.useCallback(() => {
-  // 	const link = document.createElement('a');
-  // 	link.download = 'chart.png';
-  // 	link.href = ref.current.toBase64Image();
-  // 	link.click();
-  // }, []);
   return (
     <Grid container spacing={2} alignItems="center">
       <Grid item xs={12} md={7} lg={8} position="relative">

@@ -15,7 +15,7 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import useForm from "../hooks/useForm";
-import { IUsuario } from "../interfaces/Usuario";
+import IUsuario from "../interfaces/Usuario";
 import ICliente from "../interfaces/Cliente";
 
 interface FormProps<T> {
@@ -89,9 +89,8 @@ interface UsuarioFormProps {
 }
 
 const UsuarioForm = (props: UsuarioFormProps): JSX.Element => {
-  const { form, handleChange, handleClose, handleSelectChange } = props;
+  const { form, handleChange, handleSelectChange } = props;
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
-  const theme = useTheme();
   return (
     <>
       {!props.editing.id && (
@@ -198,9 +197,7 @@ interface ClienteFormProps {
 }
 
 const ClienteForm = (props: ClienteFormProps): JSX.Element => {
-  const { form, handleChange, handleClose } = props;
-  const [showPassword, setShowPassword] = React.useState<boolean>(false);
-  const theme = useTheme();
+  const { form, handleChange } = props;
   return (
     <>
       {!props.editing.no_identificacion && (

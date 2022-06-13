@@ -1,10 +1,7 @@
-import React from "react";
 import ReactPDF from "@react-pdf/renderer";
-const { Image, Text, View } = ReactPDF;
-import { tipoHabitaciones } from "../data";
+const { Text, View } = ReactPDF;
 import styles from "../pdfStyles";
 import { formatCurrency } from "../utils";
-import { hardReservas } from "../data/index";
 import IReserva from "../interfaces/Reserva";
 import moment from "moment";
 
@@ -89,7 +86,9 @@ const ReservasPorCliente = (props: ReservasPorClienteProps) => {
                             >
                               {tKey}:{" "}
                               {tKey === "precio"
-                                ? formatCurrency(Number(tValue))
+                                ? formatCurrency(
+                                    Number(tValue) * reserva.numero_noches
+                                  )
                                 : tValue}
                               {index !==
                               Object.values(reserva.habitacion.tipo).length - 1

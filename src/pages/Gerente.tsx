@@ -7,13 +7,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { UserLayout, UserLayoutLeft, UserLayoutRight } from "../components";
 import Informe from "../components/Informe";
 import { TiposDeHabitacion, ReservasPorCliente } from "../informes";
-import ICliente from "../interfaces/Cliente";
-import { hardReservas } from "../data/index";
-import IReserva from "../interfaces/Reserva";
 import toast from "react-hot-toast";
 import { tipoHabitaciones } from "../data";
 import useAxios from "../hooks/useAxios";
@@ -106,8 +103,21 @@ const ExportReservasPorCliente = () => {
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!id.length) {
+      toast.error("Debe ingresar la identificación de un cliente");
+      return;
+    }
     getReservasByClientId(id);
   };
+
+  // React.useEffect(() => {
+  //   if (!reservas?.length && id.length && !loading) {
+  //     toast.error(
+  //       `El cliente con identificación ${id} no tiene reservas o no existe`
+  //     );
+  //     return;
+  //   }
+  // }, [reservas, loading]);
 
   return (
     <Stack alignItems="center" justifyContent="center" spacing={1}>
@@ -121,6 +131,7 @@ const ExportReservasPorCliente = () => {
         onSubmit={submit}
         direction="row"
         alignItems="stretch"
+        spacing={0.5}
       >
         <TextField
           label="Identificación del cliente"

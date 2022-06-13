@@ -31,13 +31,11 @@ const ListaTipoHabitacion = (): JSX.Element => {
         Tipos de habitaciones
       </Typography>
       <Stack
-        // className="hide-scrollbar-x_xs"
         className="hide-scrollbar-x"
         direction="row"
         gap={1}
         sx={{
           overflowX: "scroll",
-          // cursor: "grab",
         }}
         py={2}
       >

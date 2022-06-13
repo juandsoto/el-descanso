@@ -1,34 +1,41 @@
 import React from "react";
-import Stack from "@mui/material/Stack";
-import { nombreServicios } from "../data/index";
 import {
+  Stack,
   Box,
   TextField,
   Divider,
   Button,
   Checkbox,
   FormGroup,
-} from "@mui/material";
-import IReserva from "../interfaces/Reserva";
-import {
   FormControl,
   FormControlLabel,
   FormLabel,
   Radio,
   RadioGroup,
   Typography,
+  CircularProgress,
 } from "@mui/material";
+import moment from "moment";
+import { motion } from "framer-motion";
+import IReserva from "../interfaces/Reserva";
+import { nombreServicios } from "../data/index";
 import { formatCurrency, isServiceAvailable } from "../utils";
 import { useTheme } from "@mui/material/styles";
-import { DotLoader } from "react-spinners";
-import { motion } from "framer-motion";
 import useReservas from "../hooks/useReservas";
-import moment from "moment";
+import useFacturas from "../hooks/useFacturas";
+import useHabitaciones from "../hooks/useHabitaciones";
 
 const ConsultarReserva = () => {
   const [option, setOption] = React.useState<"reserva" | "cliente">("reserva");
   const valueRef = React.useRef<HTMLInputElement>(null);
-  const { reservas, getReservasById, getReservasByClientId } = useReservas();
+  const {
+    reservas,
+    loading,
+    reservasByIdError,
+    reservasByClientIdError,
+    getReservasById,
+    getReservasByClientId,
+  } = useReservas();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,6 +70,7 @@ const ConsultarReserva = () => {
         <Stack
           spacing={4}
           direction={{ xs: "column", sm: "row", lg: "column" }}
+          alignItems="center"
         >
           <motion.div layout transition={{ ease: "easeInOut", duration: 0.5 }}>
             <Stack alignItems="flex-start" justifyContent="flex-start">
@@ -105,18 +113,19 @@ const ConsultarReserva = () => {
               </Box>
             </Stack>
           </motion.div>
-          {/* {reserva?.cliente && (
-            <RenderCliente>
-              {Object.entries(reserva.cliente || {}).map(([key, value]) => {
-                return (
-                  <Box key={key}>
-                    {key} - {value}
-                  </Box>
-                );
-              })}
-            </RenderCliente>
-          )} */}
-          {reservas && reservas[0].cliente && (
+          {loading && <CircularProgress color="primary" />}
+          {reservasByIdError?.code === "ERR_BAD_REQUEST" && (
+            <Typography color="error.main" variant="h6">
+              Reserva #{valueRef?.current?.value} no existe
+            </Typography>
+          )}
+          {reservasByClientIdError?.code === "ERR_BAD_REQUEST" && (
+            <Typography color="error.main" variant="h6">
+              Cliente con identificación {valueRef?.current?.value} no registra
+              reservas
+            </Typography>
+          )}
+          {reservas && reservas[0]?.cliente && (
             <RenderCliente>
               {Object.entries(reservas[0].cliente || {}).map(([key, value]) => {
                 return (
@@ -132,12 +141,18 @@ const ConsultarReserva = () => {
           className="hide-scrollbar"
           sx={{ maxHeight: "400px", overflowY: "scroll" }}
         >
-          {/* {!reserva && !reservas && <DotLoader />} */}
-          {/* {reserva && <RenderReservas reserva={reserva} />} */}
           {reservas &&
-            reservas.map(reserva => (
-              <RenderReservas key={reserva.no_reserva} reserva={reserva} />
-            ))}
+            reservas
+              .sort(
+                (a, b) =>
+                  // @ts-ignore
+                  moment(b.fecha_entrada).add(b.numero_noches, "days") -
+                  // @ts-ignore
+                  moment(a.fecha_entrada).add(a.numero_noches, "days")
+              )
+              .map(reserva => (
+                <RenderReservas key={reserva.no_reserva} reserva={reserva} />
+              ))}
         </Stack>
       </Stack>
     </Stack>
@@ -176,17 +191,36 @@ interface RenderReservasProps {
 }
 
 const RenderReservas = (props: RenderReservasProps) => {
-  const { reserva } = props;
-
+  const [reserva, setReserva] = React.useState<IReserva>(props.reserva);
   const { fecha_entrada } = reserva;
-  const fecha_salida = moment(fecha_entrada).add(reserva.numero_noches, "days");
-  const inProgress = moment().isBetween(fecha_entrada, fecha_salida);
-  console.log(inProgress);
-  const isCancelada = reserva.cancelada;
-  const showCheckin = moment().isBetween(
-    moment(fecha_entrada).subtract(6, "hours"),
-    moment(fecha_entrada).add(6, "hours")
+  const fecha_salida = moment(fecha_entrada)
+    .add(5, "hours")
+    .add(reserva.numero_noches, "days");
+  const { cancelarReserva } = useReservas();
+  const { createFactura } = useFacturas();
+  const { cambiarEstadoHabitacion } = useHabitaciones();
+  const [inProgress, setInProgress] = React.useState<boolean>(
+    moment().isBetween(moment(fecha_entrada).add(5, "hours"), fecha_salida) ||
+      reserva.habitacion.estado === "ocupada"
   );
+  const isCancelada = reserva.cancelada;
+  const showCheckin =
+    moment().isBetween(
+      moment(fecha_entrada).subtract(11, "hours"),
+      moment(fecha_entrada).add(6, "hours")
+    ) && reserva.habitacion.estado !== "ocupada";
+
+  const cancelar = () => {
+    cancelarReserva(reserva.no_reserva);
+    setReserva(prev => ({ ...prev, cancelada: true }));
+    cambiarEstadoHabitacion(reserva.habitacion.no_habitacion, "disponible");
+  };
+
+  const checkin = (precioTotal: number) => {
+    setInProgress(true);
+    createFactura({ reserva: reserva.no_reserva, precio_total: precioTotal });
+    cambiarEstadoHabitacion(reserva.habitacion.no_habitacion, "ocupada");
+  };
 
   const getEstado = (): {
     color: string;
@@ -257,7 +291,9 @@ const RenderReservas = (props: RenderReservasProps) => {
                           <Typography key={tKey}>
                             {tKey}:{" "}
                             {tKey === "precio"
-                              ? formatCurrency(tValue as number)
+                              ? formatCurrency(
+                                  (tValue * reserva.numero_noches) as number
+                                )
                               : tValue}
                           </Typography>
                         )
@@ -278,11 +314,19 @@ const RenderReservas = (props: RenderReservasProps) => {
               {getEstado().estado === "pendiente" && (
                 <>
                   {showCheckin && (
-                    <Button variant="outlined" color="primary">
+                    <Button
+                      variant="text"
+                      color="primary"
+                      onClick={() =>
+                        checkin(
+                          reserva.habitacion.tipo.precio * reserva.numero_noches
+                        )
+                      }
+                    >
                       Check-in
                     </Button>
                   )}
-                  <Button variant="outlined" color="error">
+                  <Button variant="text" color="error" onClick={cancelar}>
                     Cancelar
                   </Button>
                 </>

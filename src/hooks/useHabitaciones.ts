@@ -1,3 +1,4 @@
+import { EstadoHabitacion } from "./../interfaces/Habitacion";
 import React from "react";
 import ICliente from "../interfaces/Cliente";
 import { useAuth } from "../context/auth/index";
@@ -10,6 +11,8 @@ import { useAppContext } from "../context/index";
 
 const useHabitaciones = () => {
   const [state, setState] = React.useState<IHabitacion[]>();
+  const [habitacionesLeft, setHabitacionesLeft] = React.useState<number[]>([]);
+
   const { user } = useAuth();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${user.token}`,
@@ -33,6 +36,17 @@ const useHabitaciones = () => {
       // headers,
     },
     { manual: true }
+  );
+
+  const [
+    { data: patchResponse, loading: patchLoading, error: patchError },
+    patchHabitacion,
+  ] = useAxios<IHabitacion, { estado: EstadoHabitacion } | { precio: number }>(
+    {
+      method: "PATCH",
+      headers,
+    },
+    { manual: true, autoCancel: false }
   );
 
   // const [
@@ -59,11 +73,24 @@ const useHabitaciones = () => {
     });
   };
 
-  // const deleteClientById = (id: string) => {
-  //   patchClient({
-  //     url: `/client/${id}`,
-  //   });
-  // };
+  const cambiarEstadoHabitacion = (id: number, estado: EstadoHabitacion) => {
+    patchHabitacion({
+      url: `/habitacion/${id}/`,
+      data: {
+        estado,
+      },
+    });
+  };
+
+  const cambiarEstadosHabitaciones = (habitaciones: number[]) => {
+    setHabitacionesLeft(habitaciones);
+  };
+
+  React.useEffect(() => {
+    if (!habitacionesLeft.length) return;
+    cambiarEstadoHabitacion(habitacionesLeft[0], "reservada");
+    setHabitacionesLeft(habitacionesLeft.slice(1));
+  }, [habitacionesLeft]);
 
   React.useEffect(() => {
     if (!habitaciones?.length) return;
@@ -92,6 +119,9 @@ const useHabitaciones = () => {
   return {
     habitaciones: state,
     createHabitacion,
+    loading,
+    cambiarEstadoHabitacion,
+    cambiarEstadosHabitaciones,
     // updateClient,
     // deleteClient: deleteClientById,
   };

@@ -32,7 +32,6 @@ interface RightProps {
 }
 
 const UserLayout = ({ children }: LayoutProps): JSX.Element => {
-  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -42,7 +41,7 @@ const UserLayout = ({ children }: LayoutProps): JSX.Element => {
         display: "flex",
         alignItems: "stretch",
         position: "relative",
-        bgcolor: theme.palette.background.default,
+        bgcolor: "background.default",
       }}
     >
       {children}
@@ -51,7 +50,6 @@ const UserLayout = ({ children }: LayoutProps): JSX.Element => {
 };
 
 export const UserLayoutLeft = (): JSX.Element => {
-  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -62,7 +60,7 @@ export const UserLayoutLeft = (): JSX.Element => {
         boxShadow: "1px 0 10px rgba(0,0,0,0.2)",
         padding: ".5rem",
         borderRadius: "20px",
-        bgcolor: theme.palette.background.default,
+        bgcolor: "background.default",
       }}
     >
       <Sidebar hasTitle={false} />
@@ -75,7 +73,6 @@ export const UserLayoutRight = (
 ): JSX.Element => {
   const [showNav, setShowNav] = React.useState(false);
   const theme = useTheme();
-
   return (
     <>
       <Box
@@ -86,7 +83,6 @@ export const UserLayoutRight = (
           width: { xs: "100%", md: "calc(100% - 200px)" },
           padding: ".6rem",
           paddingBottom: "40px",
-          // backgroundImage: 'url("../../src/assets/images/bubble.png")',
         }}
       >
         <Stack
@@ -99,7 +95,7 @@ export const UserLayoutRight = (
             component="h1"
             sx={{
               letterSpacing: "0.2rem",
-              color: theme.palette.primary.main,
+              color: "primary.main",
               fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
             }}
           >
@@ -160,7 +156,6 @@ const Sidebar = (props: SidebarProps) => {
       width="100%"
       height="100%"
       sx={{
-        // minWidth: "200px",
         bgcolor: "background.default",
         display: "flex",
         flexDirection: "column",

@@ -9,13 +9,11 @@ import {
 } from "../components";
 
 const Home = (): JSX.Element => {
-  const theme = useTheme();
-
   return (
     <Stack
       spacing={10}
       sx={{
-        bgcolor: theme.palette.background.default,
+        bgcolor: "background.default",
       }}
     >
       <Box height="100vh">
@@ -44,7 +42,7 @@ const Home = (): JSX.Element => {
           backgroundColor: "white",
           padding: "4px 12px",
           borderRadius: "20px",
-          bgcolor: theme.palette.background.default,
+          bgcolor: "background.default",
           zIndex: 99,
         }}
       >

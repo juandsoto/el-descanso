@@ -23,7 +23,7 @@ import Filtro from "./Filtro";
 import { useReserva } from "../context/reserva";
 import { nombreTipoHabitaciones } from "../data";
 import { useTheme } from "@mui/material/styles";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import ConfirmDialog from "./ConfirmDialog";
 import { useAuth } from "../context/auth/index";
@@ -64,6 +64,17 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
 
   const onNuevaHabitacion = (tipo: Exclude<NombreTipoHabitacion, "todas">) => {
     createHabitacion(tipo);
+  };
+
+  const getColor = (estado: Omit<EstadoHabitacion, "todas">) => {
+    switch (estado) {
+      case "disponible":
+        return "primary.main";
+      case "ocupada":
+        return "error.main";
+      case "reservada":
+        return "warning.main";
+    }
   };
 
   return (
@@ -179,7 +190,9 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
               {!inAdminPanel && (
                 <TableCell align="center">Seleccionar</TableCell>
               )}
-              {inAdminPanel && <TableCell align="center">Eliminar</TableCell>}
+              {inAdminPanel && user.rol === "administrador" && (
+                <TableCell align="center">Eliminar</TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody component={motion.tbody}>
@@ -235,7 +248,16 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
                       <TableCell align="center">
                         {habitacion.tipo.tipo}
                       </TableCell>
-                      <TableCell align="center">{habitacion.estado}</TableCell>
+                      <TableCell align="center">
+                        <Box
+                          sx={{
+                            bgcolor: getColor(habitacion.estado),
+                            borderRadius: "20px",
+                          }}
+                        >
+                          {habitacion.estado}
+                        </Box>
+                      </TableCell>
                       <TableCell align="center">
                         {formatCurrency(habitacion.tipo.precio)}
                       </TableCell>
@@ -244,7 +266,7 @@ const Habitaciones = (props: HabitacionesProps): JSX.Element => {
                           <CheckHabitacion habitacion={habitacion} />
                         </TableCell>
                       )}
-                      {inAdminPanel && (
+                      {inAdminPanel && user.rol === "administrador" && (
                         <TableCell align="center">
                           <Button
                             variant="text"

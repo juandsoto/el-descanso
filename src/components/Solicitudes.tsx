@@ -110,9 +110,11 @@ const Solicitudes = () => {
                   {column}
                 </TableCell>
               ))}
-              <TableCell align="center" sx={{ textTransform: "capitalize" }}>
-                completar
-              </TableCell>
+              {user.rol !== "gerente" && (
+                <TableCell align="center" sx={{ textTransform: "capitalize" }}>
+                  completar
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -162,16 +164,17 @@ const Solicitudes = () => {
                     }}
                   >
                     <Solicitud solicitud={solicitud} />
-                    {solicitud.estado === "pendiente" && (
-                      <TableCell align="center">
-                        <CheckIcon
-                          fontSize="medium"
-                          htmlColor={theme.palette.primary.main}
-                          onClick={() => onSetSolicitud(solicitud.id)}
-                          sx={{ cursor: "pointer" }}
-                        />
-                      </TableCell>
-                    )}
+                    {solicitud.estado === "pendiente" &&
+                      user.rol !== "gerente" && (
+                        <TableCell align="center">
+                          <CheckIcon
+                            fontSize="medium"
+                            htmlColor={theme.palette.primary.main}
+                            onClick={() => onSetSolicitud(solicitud.id)}
+                            sx={{ cursor: "pointer" }}
+                          />
+                        </TableCell>
+                      )}
                   </TableRow>
                 ))
               )}

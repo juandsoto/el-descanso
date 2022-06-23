@@ -4,6 +4,7 @@ import { useAuth } from "../context/auth/index";
 import useAxios from "../hooks/useAxios";
 import toast from "react-hot-toast";
 import IReservaBody from "../interfaces/api/ReservaBody";
+import { useAppContext } from "../context/index";
 import IReservaPostResponse, {
   ReservaResponse,
 } from "../interfaces/api/ReservaPostResponse";
@@ -13,6 +14,9 @@ const useReservas = () => {
   const [postReservas, setPostReservas] = React.useState<ReservaResponse[]>([]);
   const [reservasLeft, setReservasLeft] = React.useState<IReservaBody[]>([]);
   const { user } = useAuth();
+  const {
+    backdrop: { openBackdrop, closeBackdrop },
+  } = useAppContext();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${user.token}`,
   };
@@ -71,6 +75,7 @@ const useReservas = () => {
 
   const reset = () => {
     setState([]);
+    setPostReservas([]);
   };
 
   const getReservasById = (id: number) => {
@@ -95,6 +100,7 @@ const useReservas = () => {
   };
 
   const cancelarReserva = (id: number) => {
+    openBackdrop();
     patchReserva({
       url: `/reserva/${id}/`,
       data: {
@@ -108,7 +114,9 @@ const useReservas = () => {
   React.useEffect(() => {
     if (!reservasLeft.length) return;
     createReserva(reservasLeft[0]);
-    setReservasLeft(reservasLeft.slice(1));
+    setTimeout(() => {
+      setReservasLeft(reservasLeft.slice(1));
+    }, 1000);
   }, [reservasLeft]);
 
   React.useEffect(() => {
@@ -136,6 +144,13 @@ const useReservas = () => {
     setPostReservas(prev => [...prev, postResponse.reserva]);
     toast.success("Reserva creada exitosamente!");
   }, [postResponse]);
+
+  React.useEffect(() => {
+    if (!patchResponse) return;
+    console.log(patchResponse);
+    closeBackdrop();
+    toast.success("Reserva cancelada exitosamente!");
+  }, [patchResponse]);
 
   return {
     reservas: state,

@@ -20,6 +20,7 @@ import {
 } from "chart.js";
 import IAvailableServices from "../interfaces/AvailableServices";
 import { NombreTipoHabitacion } from "../interfaces/TipoHabitacion";
+import { CodServicio } from "../interfaces/Servicio";
 
 ChartJS.register(
   CategoryScale,
@@ -84,7 +85,7 @@ export const tipoHabitaciones: Pick<
   },
 ];
 
-export const nombreServicios = [
+export const nombreServicios: CodServicio[] = [
   "restaurante",
   "llamadas",
   "lavado",
@@ -120,7 +121,7 @@ export const usoDeServicios = {
         borderWidth: 0,
         backgroundColor: [
           "rgba(39, 60, 117,0.9)",
-          "rgba(255, 56, 56,0.9)",
+          "rgba(255, 205, 60, 0.9)",
           "rgba(50, 255, 126,0.9)",
           "rgba(125, 95, 255,0.9)",
           "rgba(23, 192, 235,0.9)",

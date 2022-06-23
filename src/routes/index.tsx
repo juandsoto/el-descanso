@@ -10,7 +10,8 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, path }: ProtectedRouteProps) => {
   const { user } = useAuth();
   if (!user.rol?.length) return <Navigate to="/el-descanso/login" />;
-  if (user.rol === "administrador") return <>{children}</>;
+  if (user.rol === "administrador" || user.rol === "gerente")
+    return <>{children}</>;
   if (user.rol === path) return <>{children}</>;
 
   return <Navigate to={`/el-descanso/${user.rol}`} />;

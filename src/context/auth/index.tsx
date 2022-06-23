@@ -1,6 +1,6 @@
 import * as React from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
-import { IUsuario } from "../../interfaces/Usuario";
+import IUsuario from "../../interfaces/Usuario";
 
 interface Props {
   children: JSX.Element | JSX.Element[];

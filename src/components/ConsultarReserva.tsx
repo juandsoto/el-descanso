@@ -24,6 +24,11 @@ import { useTheme } from "@mui/material/styles";
 import useReservas from "../hooks/useReservas";
 import useFacturas from "../hooks/useFacturas";
 import useHabitaciones from "../hooks/useHabitaciones";
+import useServicios from "../hooks/useServicios";
+import { CodServicio } from "../interfaces/Servicio";
+import IServicioIncluido from "../interfaces/ServicioIncluido";
+import IServicio from "../interfaces/Servicio";
+import { useAuth } from "../context/auth/index";
 
 const ConsultarReserva = () => {
   const [option, setOption] = React.useState<"reserva" | "cliente">("reserva");
@@ -130,7 +135,7 @@ const ConsultarReserva = () => {
               {Object.entries(reservas[0].cliente || {}).map(([key, value]) => {
                 return (
                   <Box key={key}>
-                    {key} - {value}
+                    {key.toUpperCase()}: {value}
                   </Box>
                 );
               })}
@@ -177,8 +182,7 @@ const RenderCliente = ({ children }: RenderClienteProps) => {
           borderRadius: "20px",
           padding: 2,
         }}
-        alignItems="center"
-        justifyContent="center"
+        alignItems="flex-start"
       >
         {children}
       </Stack>
@@ -192,6 +196,10 @@ interface RenderReservasProps {
 
 const RenderReservas = (props: RenderReservasProps) => {
   const [reserva, setReserva] = React.useState<IReserva>(props.reserva);
+  const [servicios_incluidos, setServicios_incluidos] = React.useState<
+    IServicio[]
+  >([]);
+  const { user } = useAuth();
   const { fecha_entrada } = reserva;
   const fecha_salida = moment(fecha_entrada)
     .add(5, "hours")
@@ -199,16 +207,27 @@ const RenderReservas = (props: RenderReservasProps) => {
   const { cancelarReserva } = useReservas();
   const { createFactura } = useFacturas();
   const { cambiarEstadoHabitacion } = useHabitaciones();
-  const [inProgress, setInProgress] = React.useState<boolean>(
-    moment().isBetween(moment(fecha_entrada).add(5, "hours"), fecha_salida) ||
-      reserva.habitacion.estado === "ocupada"
-  );
+  const {
+    serviciosIncluidos,
+    serviciosIncluidosLoading,
+    fetchServiciosIncluidos,
+  } = useServicios();
+  const inProgress =
+    moment().isBetween(
+      moment(fecha_entrada).subtract(12, "hours"),
+      moment(fecha_salida).add(12, "hours")
+    ) && reserva.habitacion.estado === "ocupada";
   const isCancelada = reserva.cancelada;
+  const isCompleted = moment(fecha_salida).isBefore(moment());
   const showCheckin =
     moment().isBetween(
-      moment(fecha_entrada).subtract(11, "hours"),
-      moment(fecha_entrada).add(6, "hours")
-    ) && reserva.habitacion.estado !== "ocupada";
+      moment(fecha_entrada).subtract(12, "hours"),
+      moment(fecha_salida).add(12, "hours")
+    ) &&
+    reserva.habitacion.estado !== "ocupada" &&
+    !isCancelada;
+
+  const showServiciosIncluidos = (inProgress || isCompleted) && !isCancelada;
 
   const cancelar = () => {
     cancelarReserva(reserva.no_reserva);
@@ -217,8 +236,15 @@ const RenderReservas = (props: RenderReservasProps) => {
   };
 
   const checkin = (precioTotal: number) => {
-    setInProgress(true);
-    createFactura({ reserva: reserva.no_reserva, precio_total: precioTotal });
+    setReserva(prev => ({
+      ...prev,
+      habitacion: { ...prev.habitacion, estado: "ocupada" },
+    }));
+    createFactura({
+      no_factura: reserva.no_reserva,
+      reserva: reserva.no_reserva,
+      precio_total: precioTotal,
+    });
     cambiarEstadoHabitacion(reserva.habitacion.no_habitacion, "ocupada");
   };
 
@@ -226,6 +252,11 @@ const RenderReservas = (props: RenderReservasProps) => {
     color: string;
     estado: "cancelada" | "en progreso" | "completada" | "pendiente";
   } => {
+    if (isCompleted)
+      return {
+        color: "primary.main",
+        estado: "completada",
+      };
     if (isCancelada)
       return {
         color: "error.main",
@@ -236,23 +267,33 @@ const RenderReservas = (props: RenderReservasProps) => {
         color: "secondary.main",
         estado: "en progreso",
       };
-    if (moment(fecha_salida).isBefore(moment()))
-      return {
-        color: "primary.main",
-        estado: "completada",
-      };
     return {
       color: "warning.main",
       estado: "pendiente",
     };
   };
 
+  React.useEffect(() => {
+    if (!serviciosIncluidos?.length) return;
+    setServicios_incluidos(serviciosIncluidos.map(s => s.servicio));
+  }, [serviciosIncluidos]);
+  React.useEffect(() => {
+    fetchServiciosIncluidos(reserva.no_reserva);
+  }, []);
+
+  const getTotal = React.useCallback(() => {
+    return (
+      servicios_incluidos?.reduce((acc, s) => acc + s.precio, 0) +
+      reserva.habitacion.tipo.precio * reserva.numero_noches
+    );
+  }, [servicios_incluidos]);
+
   return (
     <Box pb={1}>
       <Stack
         direction={{ xs: "column", sm: "row" }}
         justifyContent="flex-start"
-        alignItems="center"
+        alignItems="flex-start"
         spacing={2}
       >
         <Box>
@@ -265,10 +306,23 @@ const RenderReservas = (props: RenderReservasProps) => {
             <Typography color="primary" variant="h6" component="h4">
               Reserva #{reserva.no_reserva}
             </Typography>
-            <Typography component="span">
+            <Typography
+              component="span"
+              sx={{
+                color:
+                  moment().isAfter(
+                    moment(reserva.fecha_entrada).add(5, "hours")
+                  ) &&
+                  !isCompleted &&
+                  !inProgress &&
+                  !isCancelada
+                    ? "error.main"
+                    : "auto",
+              }}
+            >
               {moment(reserva.fecha_entrada)
                 .add(5, "hours")
-                .format("DD/MM/YYYY, HH:mm")}
+                .format("DD/MM/YYYY, HH:mm a")}
             </Typography>
             <Typography component="span">
               {reserva.numero_noches}{" "}
@@ -291,9 +345,7 @@ const RenderReservas = (props: RenderReservasProps) => {
                           <Typography key={tKey}>
                             {tKey}:{" "}
                             {tKey === "precio"
-                              ? formatCurrency(
-                                  (tValue * reserva.numero_noches) as number
-                                )
+                              ? formatCurrency(getTotal())
                               : tValue}
                           </Typography>
                         )
@@ -311,60 +363,98 @@ const RenderReservas = (props: RenderReservasProps) => {
               </Typography>
             </Stack>
             <Stack justifyContent="space-around">
-              {getEstado().estado === "pendiente" && (
-                <>
-                  {showCheckin && (
-                    <Button
-                      variant="text"
-                      color="primary"
-                      onClick={() =>
-                        checkin(
-                          reserva.habitacion.tipo.precio * reserva.numero_noches
-                        )
-                      }
-                    >
-                      Check-in
-                    </Button>
-                  )}
-                  <Button variant="text" color="error" onClick={cancelar}>
-                    Cancelar
-                  </Button>
-                </>
+              {showCheckin && user.rol !== "gerente" && (
+                <Button
+                  variant="text"
+                  color="primary"
+                  onClick={() =>
+                    checkin(
+                      reserva.habitacion.tipo.precio * reserva.numero_noches
+                    )
+                  }
+                >
+                  Check-in
+                </Button>
+              )}
+              {getEstado().estado === "pendiente" && user.rol !== "gerente" && (
+                <Button variant="text" color="error" onClick={cancelar}>
+                  Cancelar
+                </Button>
               )}
             </Stack>
           </Stack>
         </Box>
-        {inProgress && !isCancelada && (
+        {showServiciosIncluidos && (user.rol !== "gerente" || isCompleted) && (
           <Stack>
             <Typography color="primary" variant="subtitle1" component="h5">
               Servicios Incluidos
             </Typography>
-            <FormGroup>
-              {nombreServicios.map(
-                (servicio, index) =>
-                  isServiceAvailable(
-                    reserva.habitacion.tipo.tipo,
-                    servicio
-                  ) && (
-                    <FormControlLabel
-                      sx={{ textTransform: "capitalize" }}
-                      key={index}
-                      control={
-                        <Checkbox
-                          size="small"
-                          checked={false}
-                          onChange={() => {}}
-                        />
-                      }
-                      label={servicio}
-                    />
-                  )
-              )}
-            </FormGroup>
+            {serviciosIncluidosLoading ? (
+              <CircularProgress color="primary" size={25} />
+            ) : (
+              <FormGroup>
+                {nombreServicios.map(
+                  (servicio, index) =>
+                    isServiceAvailable(
+                      reserva.habitacion.tipo.tipo,
+                      servicio
+                    ) && (
+                      <CheckServicio
+                        key={index}
+                        cod_servicio={servicio}
+                        no_factura={reserva.no_reserva}
+                        servicios_incluidos={servicios_incluidos ?? []}
+                        disabled={isCompleted}
+                      />
+                    )
+                )}
+              </FormGroup>
+            )}
           </Stack>
         )}
       </Stack>
     </Box>
+  );
+};
+
+interface CheckServicioProps {
+  cod_servicio: CodServicio;
+  no_factura: number;
+  servicios_incluidos: IServicio[];
+  disabled: boolean;
+}
+
+const CheckServicio = (props: CheckServicioProps) => {
+  const { cod_servicio, no_factura, servicios_incluidos, disabled } = props;
+  const [checked, setChecked] = React.useState<boolean>(false);
+  const { createServicioIncluido } = useServicios();
+
+  const onCheck = () => {
+    if (checked) return;
+    createServicioIncluido(no_factura, cod_servicio);
+    setChecked(true);
+  };
+
+  React.useEffect(() => {
+    if (!servicios_incluidos.length) return;
+    setChecked(
+      servicios_incluidos.map(s => s.cod_servicio).includes(cod_servicio)
+    );
+  }, [servicios_incluidos]);
+
+  return (
+    <FormControlLabel
+      sx={{ textTransform: "capitalize" }}
+      control={
+        <Checkbox
+          size="small"
+          disabled={disabled || checked}
+          checked={checked}
+          onChange={onCheck}
+        />
+      }
+      label={props.cod_servicio}
+    />
   );
 };
 

@@ -309,7 +309,7 @@ const ResumenReservas = (props: ResumenReservasProps) => {
             {cliente.nombre[0].toUpperCase()}
           </Avatar>
           <Stack
-            alignItems="center"
+            alignItems="flex-start"
             spacing={1}
             sx={{
               boxShadow: `inset 0px -2px 5px ${theme.palette.grey[900]}`,
@@ -333,41 +333,42 @@ const ResumenReservas = (props: ResumenReservasProps) => {
             overflow: "scroll",
           }}
         >
-          {reservas.length &&
-            reservas?.map(reserva => (
-              <Stack key={reserva?.no_reserva} spacing={0.5}>
-                <Stack
-                  spacing={{ xs: 0.5, sm: 2 }}
-                  direction={{ xs: "column", sm: "row" }}
-                  alignItems="center"
-                  justifyContent={{ xs: "flex-start", sm: "space-between" }}
-                >
-                  <Typography
-                    textAlign={{ xs: "center", sm: "left" }}
-                    variant="h6"
-                    component="h4"
-                    color="primary.main"
+          {!reservas.length
+            ? "Cargando..."
+            : reservas?.map(reserva => (
+                <Stack key={reserva?.no_reserva} spacing={0.5}>
+                  <Stack
+                    spacing={{ xs: 0.5, sm: 2 }}
+                    direction={{ xs: "column", sm: "row" }}
+                    alignItems="center"
+                    justifyContent={{ xs: "flex-start", sm: "space-between" }}
                   >
-                    Reserva #{reserva?.no_reserva}
-                  </Typography>
-                  <Stack direction="row" spacing={2}>
-                    <Typography component="span">
-                      {moment(reserva?.fecha_entrada)
-                        .add(5, "hours")
-                        .format("DD/MM/YYYY, HH:mm")}
+                    <Typography
+                      textAlign={{ xs: "center", sm: "left" }}
+                      variant="h6"
+                      component="h4"
+                      color="primary.main"
+                    >
+                      Reserva #{reserva?.no_reserva}
                     </Typography>
-                    <Typography component="span" color="secondary.main">
-                      {reserva?.numero_noches}{" "}
-                      {reserva?.numero_noches === 1 ? "noche" : "noches"}
-                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                      <Typography component="span">
+                        {moment(reserva?.fecha_entrada)
+                          .add(5, "hours")
+                          .format("DD/MM/YYYY, HH:mm")}
+                      </Typography>
+                      <Typography component="span" color="secondary.main">
+                        {reserva?.numero_noches}{" "}
+                        {reserva?.numero_noches === 1 ? "noche" : "noches"}
+                      </Typography>
+                    </Stack>
                   </Stack>
+                  <Typography textAlign="center" color="text.primary">
+                    Habitacion No.{reserva?.habitacion}
+                  </Typography>
+                  <Divider />
                 </Stack>
-                <Typography textAlign="center" color="text.primary">
-                  Habitacion No.{reserva?.habitacion}
-                </Typography>
-                <Divider />
-              </Stack>
-            ))}
+              ))}
         </Stack>
       </Stack>
     </Stack>

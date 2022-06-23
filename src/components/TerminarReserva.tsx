@@ -13,10 +13,24 @@ import { formatCurrency } from "../utils";
 import { useTheme } from "@mui/material/styles";
 import moment from "moment";
 import { motion } from "framer-motion";
+import useAxios from "../hooks/useAxios";
+import { useAuth } from "../context/auth/index";
+import PercentIcon from "@mui/icons-material/Percent";
 
 const TerminarReserva = () => {
   const { reserva } = useReserva();
   const theme = useTheme();
+  const { user } = useAuth();
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${user.token}`,
+  };
+
+  const [{ data: habitual }] = useAxios<{ descuento: number }>({
+    url: `/clientehabitualfilter/?no_identificacion=${
+      reserva.cliente!.no_identificacion
+    }`,
+    headers,
+  });
 
   const precioTotal = React.useCallback<() => number>(
     () =>
@@ -55,7 +69,8 @@ const TerminarReserva = () => {
             {reserva.cliente?.nombre[0].toUpperCase() || "-"}
           </Avatar>
           <Stack
-            alignItems="center"
+            alignItems="flex-start"
+            justifyContent="flex-start"
             spacing={1}
             sx={{
               boxShadow: `inset 0px -2px 5px ${theme.palette.grey[900]}`,
@@ -95,16 +110,64 @@ const TerminarReserva = () => {
               <HabitacionIndividual key={index} habitacion={habitacion} />
             ))}
           </Stack>
-          <Stack direction="row" justifyContent="flex-end">
-            <Typography
-              variant="subtitle1"
-              component={motion.span}
-              layout
-              transition={{ ease: "easeOut", duration: 0.5 }}
-              color="primary.main"
-            >
-              Total - {formatCurrency(precioTotal())}
-            </Typography>
+          <Stack
+            direction="row"
+            justifyContent="flex-end"
+            alignItems="center"
+            spacing={2}
+          >
+            {habitual && habitual?.descuento !== 0 && (
+              <Stack justifyContent="center">
+                <Typography>Descuento</Typography>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{
+                    bgcolor: "secondary.main",
+                    color: "white",
+                    borderRadius: "20px",
+                    fontSize: { xs: "16px", sm: "20px" },
+                  }}
+                >
+                  <Typography fontSize={{ xs: "16px", sm: "20px" }}>
+                    {habitual?.descuento}
+                  </Typography>
+                  <PercentIcon fontSize="inherit" />
+                </Stack>
+              </Stack>
+            )}
+            <Stack>
+              <Typography
+                variant="subtitle1"
+                component={motion.span}
+                layout
+                transition={{ ease: "easeOut", duration: 0.5 }}
+                color={
+                  habitual?.descuento === 0 ? "primary.main" : "text.primary"
+                }
+                sx={{
+                  textDecoration:
+                    habitual?.descuento === 0 ? "none" : "line-through",
+                }}
+              >
+                Total - {formatCurrency(precioTotal())}
+              </Typography>
+              {habitual?.descuento !== 0 && (
+                <Typography
+                  variant="subtitle1"
+                  component={motion.span}
+                  layout
+                  transition={{ ease: "easeOut", duration: 0.5 }}
+                  color="primary.main"
+                >
+                  Total -{" "}
+                  {formatCurrency(
+                    precioTotal() * (1 - habitual?.descuento! / 100)
+                  )}
+                </Typography>
+              )}
+            </Stack>
           </Stack>
         </Stack>
       </Stack>
@@ -176,15 +239,17 @@ const HabitacionIndividual = (props: HabitacionIndividualProps) => {
         </Typography>
         <Stack direction="row" spacing={1} alignItems="center">
           <TextField
-            sx={{ width: { xs: "auto", sm: "14.2rem" } }}
+            sx={{ width: { xs: "10rem", sm: "14.2rem" } }}
             size="small"
             label="fecha de entrada"
             InputLabelProps={{
               shrink: true,
             }}
-            inputProps={{
-              min: moment().format("YYYY-MM-DD[T]HH:mm:ss"),
-            }}
+            inputProps={
+              {
+                // min: moment().format("YYYY-MM-DD[T]HH:mm:ss"),
+              }
+            }
             name="fecha_entrada"
             value={props.habitacion.fecha_entrada ?? ""}
             onChange={onChange}

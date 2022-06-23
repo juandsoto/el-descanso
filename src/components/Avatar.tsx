@@ -4,7 +4,7 @@ import { useAuth } from "../context/auth/index";
 const Avatar = (): JSX.Element => {
   const { user, logout } = useAuth();
   return (
-    <Stack spacing={1} p={2} alignItems="center" textAlign="center">
+    <Stack spacing={1} alignItems="center" textAlign="center">
       <Typography
         component="span"
         sx={{

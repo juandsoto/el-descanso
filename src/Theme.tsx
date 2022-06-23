@@ -11,16 +11,46 @@ export const getDesignTokens = (mode: PaletteMode) => ({
     primary: {
       main: "#0cb0a9",
     },
+    error: {
+      main: "#f53b57",
+    },
+
     mode,
     ...(mode === "light"
       ? {
           secondary: {
             main: "#9c27b0",
           },
+
+          color: {
+            invert: "#fff",
+          },
+
+          grid: {
+            "1": "#f53b57",
+            "2": "#ffa801",
+            "3": "#575fcf",
+            "4": "#05c46b",
+          },
+          warning: {
+            main: "#ffa801",
+          },
         }
       : {
           secondary: {
             main: "#9c27b0",
+          },
+          color: {
+            invert: "#000",
+          },
+          grid: {
+            "1": "#f53b57",
+            "2": "#ffa801",
+            "3": "#575fcf",
+            "4": "#05c46b",
+          },
+          warning: {
+            main: "#ffa801",
           },
         }),
   },

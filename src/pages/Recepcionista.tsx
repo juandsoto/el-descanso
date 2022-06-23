@@ -9,8 +9,10 @@ import {
 } from "../components";
 import ConsultarReserva from "../components/ConsultarReserva";
 import CustomStepper from "../components/CustomStepper";
+import { useAuth } from "../context/auth/index";
 
 const Recepcionista = (): JSX.Element => {
+  const { user } = useAuth();
   return (
     <UserLayout>
       <UserLayoutLeft />
@@ -35,9 +37,11 @@ const Recepcionista = (): JSX.Element => {
           <Grid item xs={12} sx={{ mt: 4 }}>
             <ConsultarReserva />
           </Grid>
-          <Grid item xs={12} sx={{ mt: 4, minHeight: "80vh" }}>
-            <CustomStepper />
-          </Grid>
+          {user.rol !== "gerente" && (
+            <Grid item xs={12} sx={{ mt: 4, minHeight: "80vh" }}>
+              <CustomStepper />
+            </Grid>
+          )}
         </Grid>
       </UserLayoutRight>
     </UserLayout>

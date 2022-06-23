@@ -50,7 +50,7 @@ const Gerente = (): JSX.Element => {
             bottom: "10px",
             right: "10px",
             width: { xs: "100%", lg: "300px" },
-            boxShadow: "1px 0 10px rgba(0,0,0,0.2)",
+            boxShadow: "1px 0 10px rgba(0,0,0,0.7)",
             borderRadius: "20px",
             bgcolor: "background.default",
           }}

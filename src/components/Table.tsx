@@ -22,6 +22,9 @@ import ICliente from "../interfaces/Cliente";
 import { useReserva } from "../context/reserva/index";
 import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import EditDialog from "./EditDialog";
+import useAxios from "../hooks/useAxios";
+import { useAuth } from "../context/auth/index";
 
 interface TableProps<T> {
   title: string;
@@ -58,13 +61,26 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
   const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
+  const [isChangingDiscount, setIsChangingDiscount] =
+    React.useState<boolean>(false);
+  const { user } = useAuth();
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${user.token}`,
+  };
+
+  const [{ data: cambiarDescuentoResponse }, cambiarDescuento] = useAxios(
+    {
+      method: "PATCH",
+      headers,
+    },
+    { manual: true }
+  );
+
   const [selected, setSelected] = React.useState<Omit<T, "password">>(
     props.initialSelected
   );
   const theme = useTheme();
   const location = useLocation();
-
-  console.log("render table");
 
   const inAdminPanel = location.pathname.split("/")[2] === "administrador";
 
@@ -103,16 +119,18 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
             >
               {props.title}
             </Typography>
-            <Button
-              onClick={() => {
-                setIsCreating(true);
-              }}
-              variant="outlined"
-              color="primary"
-              startIcon={<AddIcon />}
-            >
-              Agregar
-            </Button>
+            {user.rol === "administrador" && (
+              <Button
+                onClick={() => {
+                  setIsCreating(true);
+                }}
+                variant="outlined"
+                color="primary"
+                startIcon={<AddIcon />}
+              >
+                Agregar
+              </Button>
+            )}
           </Stack>
           <TextField
             id="standard-basic"
@@ -153,8 +171,11 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
                 {!inAdminPanel && (
                   <TableCell align="center">Seleccionar</TableCell>
                 )}
-                {inAdminPanel && (
+                {inAdminPanel && user.rol === "administrador" && (
                   <>
+                    {props.type === "cliente" && (
+                      <TableCell align="center">Descuento</TableCell>
+                    )}
                     <TableCell align="center">Editar</TableCell>
                     <TableCell align="center">Eliminar</TableCell>
                   </>
@@ -213,8 +234,22 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
                             <CheckCliente cliente={row as ICliente} />
                           </TableCell>
                         )}
-                        {inAdminPanel && (
+                        {inAdminPanel && user.rol === "administrador" && (
                           <>
+                            {props.type === "cliente" && (
+                              <TableCell align="center">
+                                <Button
+                                  variant="outlined"
+                                  color="secondary"
+                                  onClick={() => {
+                                    setSelected(row);
+                                    setIsChangingDiscount(true);
+                                  }}
+                                >
+                                  descuento
+                                </Button>
+                              </TableCell>
+                            )}
                             <TableCell align="center">
                               <Button
                                 variant="text"
@@ -263,6 +298,28 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
       />
       {inAdminPanel && (
         <>
+          {props.type === "cliente" && (
+            <EditDialog
+              handleClose={() => setIsChangingDiscount(false)}
+              open={isChangingDiscount}
+              inputType="number"
+              dialogInfo={{
+                title: "Descuento",
+                name: "descuento",
+                description: `Cambiar descuento para el cliente`,
+                onCancel: () => setIsChangingDiscount(false),
+                onConfirm: (value: number) => {
+                  cambiarDescuento({
+                    url: `/clientehabitual/${selected.no_identificacion}/`,
+                    data: {
+                      descuento: value,
+                    },
+                  });
+                  setIsChangingDiscount(false);
+                },
+              }}
+            />
+          )}
           <EditDrawer
             handleClose={() => setIsEditing(false)}
             open={isEditing}

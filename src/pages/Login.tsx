@@ -75,9 +75,12 @@ const Login = (): JSX.Element => {
     const rol: Rol = response.data.user.rol.toLowerCase()! as Rol;
     console.log({ response });
     setUser({ ...response.data.user, rol, token: response.data.access });
-    navigate(`/el-descanso/${rol}`, {
+    navigate(`/${rol}`, {
       replace: true,
     });
+    // navigate(`/el-descanso/${rol}`, {
+    //   replace: true,
+    // });
   }, [response]);
 
   React.useEffect(() => {

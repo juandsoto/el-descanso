@@ -82,7 +82,7 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
   const theme = useTheme();
   const location = useLocation();
 
-  const inAdminPanel = location.pathname.split("/")[2] === "administrador";
+  const inAdminPanel = location.pathname.split("/")[1] === "administrador";
 
   let SUBJECT: ICliente | Omit<IUsuario, "password"> =
     props.type === "usuario" ? USUARIO : CLIENTE;

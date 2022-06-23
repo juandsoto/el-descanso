@@ -149,7 +149,7 @@ const Sidebar = (props: SidebarProps) => {
   const theme = useTheme();
   const { user } = useAuth();
   const location = useLocation();
-  const active = location.pathname.split("/")[2];
+  const active = location.pathname.split("/")[1];
 
   return (
     <Box
@@ -174,54 +174,54 @@ const Sidebar = (props: SidebarProps) => {
         <Logo hasTitle={props.hasTitle} />
         <Avatar />
       </Box>
-      {user.rol === "administrador" ||
-        (user.rol === "gerente" && (
-          <Stack alignItems="center">
-            <Typography variant="h5" component="h4" color="primary.main">
-              Perfiles
-            </Typography>
-            <List
-              sx={{
-                width: "100%",
-              }}
-            >
-              {navigation.map((item, index) => (
-                <ListItem
-                  key={index}
-                  disablePadding
-                  sx={{
-                    justifyContent: "center",
-                    borderLeft:
-                      item.title === active
-                        ? `3px solid ${theme.palette.primary.main}`
-                        : "",
+      {(user.rol === "administrador" || user.rol === "gerente") && (
+        <Stack alignItems="center">
+          <Typography variant="h5" component="h4" color="primary.main">
+            Perfiles
+          </Typography>
+          <List
+            sx={{
+              width: "100%",
+            }}
+          >
+            {navigation.map((item, index) => (
+              <ListItem
+                key={index}
+                disablePadding
+                sx={{
+                  justifyContent: "center",
+                  borderLeft:
+                    item.title === active
+                      ? `3px solid ${theme.palette.primary.main}`
+                      : "",
+                }}
+              >
+                <Link
+                  // to={`/el-descanso/${item.title}`}
+                  to={`/${item.title}`}
+                  style={{
+                    color: "inherit",
+                    textDecoration: "none",
                   }}
                 >
-                  <Link
-                    to={`/el-descanso/${item.title}`}
-                    style={{
-                      color: "inherit",
-                      textDecoration: "none",
-                    }}
-                  >
-                    <ListItemButton>
-                      <ListItemIcon sx={{ minWidth: "auto" }}>
-                        {item.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        sx={{
-                          textTransform: "capitalize",
-                          color: theme.palette.text.primary,
-                        }}
-                        primary={item.title}
-                      />
-                    </ListItemButton>
-                  </Link>
-                </ListItem>
-              ))}
-            </List>
-          </Stack>
-        ))}
+                  <ListItemButton>
+                    <ListItemIcon sx={{ minWidth: "auto" }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{
+                        textTransform: "capitalize",
+                        color: theme.palette.text.primary,
+                      }}
+                      primary={item.title}
+                    />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+        </Stack>
+      )}
       <ThemeSwitch />
     </Box>
   );

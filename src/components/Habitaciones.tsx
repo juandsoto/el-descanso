@@ -35,7 +35,7 @@ interface HabitacionesProps {}
 
 const Habitaciones = (props: HabitacionesProps): JSX.Element => {
   const location = useLocation();
-  const inAdminPanel = location.pathname.split("/")[2] === "administrador";
+  const inAdminPanel = location.pathname.split("/")[1] === "administrador";
 
   const { filtro: filtroEstado, handleChange: handleChangeEstado } =
     useFilter<EstadoHabitacion>(inAdminPanel ? "todas" : "disponible");

@@ -12,7 +12,8 @@ const Logo = (props: LogoProps): JSX.Element => {
   const { hasTitle = true, style } = props;
   return (
     <RRDLink
-      to="/el-descanso/"
+      // to="/el-descanso/"
+      to="/"
       style={{ color: "inherit", textDecoration: "none" }}
     >
       <Box

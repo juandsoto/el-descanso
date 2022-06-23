@@ -9,12 +9,14 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, path }: ProtectedRouteProps) => {
   const { user } = useAuth();
-  if (!user.rol?.length) return <Navigate to="/el-descanso/login" />;
+  if (!user.rol?.length) return <Navigate to="/login" />;
+  // if (!user.rol?.length) return <Navigate to="/el-descanso/login" />;
   if (user.rol === "administrador" || user.rol === "gerente")
     return <>{children}</>;
   if (user.rol === path) return <>{children}</>;
 
-  return <Navigate to={`/el-descanso/${user.rol}`} />;
+  return <Navigate to={`/${user.rol}`} />;
+  // return <Navigate to={`/el-descanso/${user.rol}`} />;
 };
 
 interface Route {
@@ -59,7 +61,8 @@ const routes: Route[] = [
   },
   {
     path: "*",
-    element: <Navigate to="/el-descanso/" />,
+    // element: <Navigate to="/el-descanso/" />,
+    element: <Navigate to="/" />,
   },
 ];
 
@@ -67,7 +70,8 @@ const Navigator = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/el-descanso">
+        {/* <Route path="/el-descanso"> */}
+        <Route path="/">
           {routes.map((props, index) => (
             <Route key={index} {...props}></Route>
           ))}

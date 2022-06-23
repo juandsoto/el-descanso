@@ -1,4 +1,4 @@
-import { IUsuario } from "../Usuario";
+import IUsuario from "../Usuario";
 
 export interface ILoginResponse {
   access: string;

@@ -9,5 +9,4 @@ export default interface ICliente {
   nombre: string;
   telefono: string;
   correo: string;
-  tipo?: IClienteHabitual;
 }

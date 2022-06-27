@@ -6,6 +6,7 @@ import {
   TextField,
   DialogActions,
   Button,
+  InputBaseComponentProps,
 } from "@mui/material";
 import React from "react";
 interface DialogInfo<T> {
@@ -20,6 +21,7 @@ interface EditDialogProps<T> {
   handleClose: () => void;
   inputType: "text" | "number";
   dialogInfo: DialogInfo<T>;
+  inputProps?: InputBaseComponentProps;
 }
 
 const EditDialog = <T extends number>(
@@ -48,6 +50,7 @@ const EditDialog = <T extends number>(
           type={props.inputType}
           fullWidth
           variant="standard"
+          inputProps={{ ...props.inputProps }}
         />
       </DialogContent>
       <DialogActions>

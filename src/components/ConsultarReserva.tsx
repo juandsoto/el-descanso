@@ -211,6 +211,7 @@ const RenderReservas = (props: RenderReservasProps) => {
     serviciosIncluidos,
     serviciosIncluidosLoading,
     fetchServiciosIncluidos,
+    postResponse,
   } = useServicios();
   const inProgress =
     moment().isBetween(
@@ -277,13 +278,23 @@ const RenderReservas = (props: RenderReservasProps) => {
     if (!serviciosIncluidos?.length) return;
     setServicios_incluidos(serviciosIncluidos.map(s => s.servicio));
   }, [serviciosIncluidos]);
+
+  // React.useEffect(() => {
+  //   if (!postResponse) return;
+  //   console.log("postresponse");
+  //   setServicios_incluidos(prev => [
+  //     ...prev,
+  //     postResponse.servicio_incluido.servicio,
+  //   ]);
+  // }, [postResponse]);
+
   React.useEffect(() => {
     fetchServiciosIncluidos(reserva.no_reserva);
   }, []);
 
-  const getTotal = React.useCallback(() => {
+  const getTotal = React.useMemo(() => {
     return (
-      servicios_incluidos?.reduce((acc, s) => acc + s.precio, 0) +
+      servicios_incluidos.reduce((acc, s) => acc + s.precio, 0) +
       reserva.habitacion.tipo.precio * reserva.numero_noches
     );
   }, [servicios_incluidos]);
@@ -345,7 +356,7 @@ const RenderReservas = (props: RenderReservasProps) => {
                           <Typography key={tKey}>
                             {tKey}:{" "}
                             {tKey === "precio"
-                              ? formatCurrency(getTotal())
+                              ? formatCurrency(getTotal)
                               : tValue}
                           </Typography>
                         )
@@ -404,6 +415,7 @@ const RenderReservas = (props: RenderReservasProps) => {
                         cod_servicio={servicio}
                         no_factura={reserva.no_reserva}
                         servicios_incluidos={servicios_incluidos ?? []}
+                        setServicios_incluidos={setServicios_incluidos}
                         disabled={isCompleted}
                       />
                     )
@@ -421,11 +433,18 @@ interface CheckServicioProps {
   cod_servicio: CodServicio;
   no_factura: number;
   servicios_incluidos: IServicio[];
+  setServicios_incluidos: React.Dispatch<React.SetStateAction<IServicio[]>>;
   disabled: boolean;
 }
 
 const CheckServicio = (props: CheckServicioProps) => {
-  const { cod_servicio, no_factura, servicios_incluidos, disabled } = props;
+  const {
+    cod_servicio,
+    no_factura,
+    servicios_incluidos,
+    disabled,
+    setServicios_incluidos,
+  } = props;
   const [checked, setChecked] = React.useState<boolean>(false);
   const { createServicioIncluido } = useServicios();
 

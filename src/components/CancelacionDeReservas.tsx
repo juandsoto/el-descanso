@@ -34,7 +34,7 @@ const CancelacionDeReservas = () => {
         alignItems="center"
         justifyContent="center"
         sx={{
-          fontSize: "1.5rem",
+          fontSize: "1.2rem",
           bgcolor: loading ? "transparent" : "error.main",
           borderRadius: "50px",
           height: "70px",

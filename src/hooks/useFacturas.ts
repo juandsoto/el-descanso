@@ -8,13 +8,11 @@ import ICheckout from "../interfaces/Checkout";
 import { useAppContext } from "../context/index";
 import toast from "react-hot-toast";
 import moment from "moment";
+import useHabitaciones from "./useHabitaciones";
 
 const useFacturas = () => {
-  const [state, setState] = React.useState<IFactura[]>();
-  const [postFacturas, setPostFacturas] = React.useState<
-    IFacturaPostResponse[]
-  >([]);
   const { user } = useAuth();
+  const { cambiarEstadoHabitacion } = useHabitaciones();
   const {
     backdrop: { openBackdrop, closeBackdrop },
   } = useAppContext();
@@ -68,7 +66,7 @@ const useFacturas = () => {
 
   const fetchFactura = (no_reserva: number) => {
     getFactura({
-      url: `/factura/${no_reserva}/`,
+      url: `/facturafiltro/?no_factura=${no_reserva}`,
     });
   };
 
@@ -87,6 +85,7 @@ const useFacturas = () => {
 
   const checkout = (
     no_factura: number,
+    no_habitacion: number,
     checkout: Omit<ICheckout, "fecha_salida">,
     isTimeout: () => boolean | undefined,
     recargo: number
@@ -115,6 +114,7 @@ const useFacturas = () => {
         },
       });
     }
+    cambiarEstadoHabitacion(no_habitacion, "disponible");
   };
 
   React.useEffect(() => {

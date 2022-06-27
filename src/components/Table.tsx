@@ -68,14 +68,6 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
     Authorization: `Bearer ${user.token}`,
   };
 
-  const [{ data: cambiarDescuentoResponse }, cambiarDescuento] = useAxios(
-    {
-      method: "PATCH",
-      headers,
-    },
-    { manual: true }
-  );
-
   const [selected, setSelected] = React.useState<Omit<T, "password">>(
     props.initialSelected
   );
@@ -173,9 +165,6 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
                 )}
                 {inAdminPanel && user.rol === "administrador" && (
                   <>
-                    {props.type === "cliente" && (
-                      <TableCell align="center">Descuento</TableCell>
-                    )}
                     <TableCell align="center">Editar</TableCell>
                     <TableCell align="center">Eliminar</TableCell>
                   </>
@@ -236,20 +225,6 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
                         )}
                         {inAdminPanel && user.rol === "administrador" && (
                           <>
-                            {props.type === "cliente" && (
-                              <TableCell align="center">
-                                <Button
-                                  variant="outlined"
-                                  color="secondary"
-                                  onClick={() => {
-                                    setSelected(row);
-                                    setIsChangingDiscount(true);
-                                  }}
-                                >
-                                  descuento
-                                </Button>
-                              </TableCell>
-                            )}
                             <TableCell align="center">
                               <Button
                                 variant="text"
@@ -298,28 +273,6 @@ const Table = <T extends Partial<Omit<IUsuario, "password"> & ICliente>>(
       />
       {inAdminPanel && (
         <>
-          {props.type === "cliente" && (
-            <EditDialog
-              handleClose={() => setIsChangingDiscount(false)}
-              open={isChangingDiscount}
-              inputType="number"
-              dialogInfo={{
-                title: "Descuento",
-                name: "descuento",
-                description: `Cambiar descuento para el cliente`,
-                onCancel: () => setIsChangingDiscount(false),
-                onConfirm: (value: number) => {
-                  cambiarDescuento({
-                    url: `/clientehabitual/${selected.no_identificacion}/`,
-                    data: {
-                      descuento: value,
-                    },
-                  });
-                  setIsChangingDiscount(false);
-                },
-              }}
-            />
-          )}
           <EditDrawer
             handleClose={() => setIsEditing(false)}
             open={isEditing}

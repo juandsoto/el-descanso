@@ -23,7 +23,7 @@ const Home = (): JSX.Element => {
       <Box id="habitaciones" px={2}>
         <ListaTipoHabitacion />
       </Box>
-      <Box id="servicios">
+      <Box id="servicios" px={2}>
         <Servicios bgImage />
       </Box>
 

@@ -12,9 +12,11 @@ import {
   Grid,
   SxProps,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import IFactura from "../interfaces/Factura";
 import useFacturas from "../hooks/useFacturas";
+import { Factura as InformeFactura } from "../informes";
 import HotelIcon from "@mui/icons-material/Hotel";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
@@ -30,7 +32,9 @@ import IServicioIncluido from "../interfaces/ServicioIncluido";
 import useAxios from "../hooks/useAxios";
 import { useAuth } from "../context/auth/index";
 import { isNull } from "lodash";
-
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import Informe from "./Informe";
+import DownloadingIcon from "@mui/icons-material/Downloading";
 const Checkout = () => {
   const { user } = useAuth();
   const headers: Record<string, string> = {
@@ -172,16 +176,6 @@ const Factura = (props: FacturaProps) => {
   const { checkout } = useFacturas();
   const { user } = useAuth();
 
-  const total = React.useCallback(
-    () =>
-      serviciosIncluidos.reduce(
-        (acc, c) => acc + c.servicio.precio,
-        (factura?.reserva.numero_noches ?? 0) *
-          (factura?.reserva.habitacion.tipo.precio ?? 0)
-      ),
-    [factura, serviciosIncluidos]
-  );
-
   const controls = useAnimation();
 
   React.useEffect(() => {
@@ -196,9 +190,28 @@ const Factura = (props: FacturaProps) => {
         }));
   }, [loading]);
 
+  const total = React.useCallback(
+    () =>
+      serviciosIncluidos.reduce(
+        (acc, c) => acc + c.servicio.precio,
+        (factura?.reserva.numero_noches ?? 0) *
+          (factura?.reserva.habitacion.tipo.precio ?? 0)
+      ),
+    [factura, serviciosIncluidos]
+  );
+
   const isTimeout = React.useCallback(() => {
     if (!factura) return false;
-    if (!isNull(factura.checkout)) return false;
+    if (factura.checkout) {
+      return (
+        moment(factura.checkout.fecha_salida).diff(
+          moment(factura?.reserva.fecha_entrada)
+            .add(factura?.reserva.numero_noches, "days")
+            .add(5, "hours"),
+          "hours"
+        ) >= 13
+      );
+    }
     return (
       moment().diff(
         moment(factura?.reserva.fecha_entrada)
@@ -224,48 +237,79 @@ const Factura = (props: FacturaProps) => {
               ? "Cargando..."
               : `Factura #${searchValue || ""}`}
           </Typography>
-          {factura?.checkout && !loading && (
-            <Stack justifyContent="center" alignItems="center">
-              <Typography variant="caption">Fecha de salida</Typography>
-              <Typography variant="body1">
-                {moment(factura?.checkout.fecha_salida)
-                  .add(5, "hours")
-                  .format("DD-MM-YYYY, HH:mm a")}
-              </Typography>
-            </Stack>
-          )}
+          {!error &&
+            factura &&
+            factura?.checkout &&
+            serviciosIncluidos &&
+            !loading && (
+              <>
+                <Stack justifyContent="center" alignItems="center">
+                  <Typography variant="caption">Fecha de salida</Typography>
+                  <Typography variant="body1">
+                    {moment(factura?.checkout.fecha_salida).format(
+                      "DD-MM-YYYY, HH:mm a"
+                    )}
+                  </Typography>
+                  <PDFDownloadLink
+                    style={{
+                      textDecoration: "none",
+                      color: "black",
+                    }}
+                    fileName={`factura_${factura?.no_factura}`}
+                    document={
+                      <Informe
+                        data={{
+                          title: "Factura",
+                        }}
+                      >
+                        <InformeFactura
+                          factura={factura}
+                          serviciosIncluidos={serviciosIncluidos}
+                          recargo={isTimeout}
+                        />
+                      </Informe>
+                    }
+                  >
+                    <Tooltip title="Descargar factura">
+                      <DownloadingIcon color="primary" />
+                    </Tooltip>
+                  </PDFDownloadLink>
+                </Stack>
+              </>
+            )}
           {!error &&
             !loading &&
             factura &&
+            moment().isAfter(
+              moment(factura.reserva.fecha_entrada)
+                .add(factura.reserva.numero_noches, "days")
+                .subtract(12, "hours")
+            ) &&
             isNull(factura.checkout) &&
             user.rol !== "gerente" && (
-              <SpeedDial
-                actions={[
-                  {
-                    icon: <PictureAsPdfIcon />,
-                    key: "Generar Factura",
-                    onClick: () => {
-                      console.log("Generar Factura");
+              <>
+                <SpeedDial
+                  actions={[
+                    {
+                      icon: <CheckCircleIcon />,
+                      key: "Checkout",
+                      onClick: () => {
+                        checkout(
+                          factura.no_factura,
+                          factura.reserva.habitacion.no_habitacion,
+                          {
+                            no_checkout: factura.no_factura,
+                            cliente: factura.reserva.cliente.no_identificacion,
+                          },
+                          isTimeout,
+                          factura.precio_total +
+                            factura.reserva.habitacion.tipo.precio
+                        );
+                      },
                     },
-                  },
-                  {
-                    icon: <CheckCircleIcon />,
-                    key: "Checkout",
-                    onClick: () => {
-                      checkout(
-                        factura.no_factura,
-                        {
-                          no_checkout: factura.no_factura,
-                          cliente: factura.reserva.cliente.no_identificacion,
-                        },
-                        isTimeout,
-                        factura.precio_total +
-                          factura.reserva.habitacion.tipo.precio
-                      );
-                    },
-                  },
-                ]}
-              />
+                  ]}
+                />
+              </>
             )}
         </Stack>
         {error ? (
@@ -273,8 +317,9 @@ const Factura = (props: FacturaProps) => {
         ) : (
           <>
             {isTimeout() && !loading && (
-              <Typography textAlign="center" variant="h4" color="warning.main">
-                Se aplicará cargo adicional por{" "}
+              <Typography textAlign="center" variant="h5" color="warning.main">
+                Se {isNull(factura?.checkout) ? "aplicará" : "aplicó"} cargo
+                adicional por{" "}
                 {formatCurrency(factura?.reserva.habitacion.tipo.precio ?? 0)}
               </Typography>
             )}
@@ -339,12 +384,17 @@ const Factura = (props: FacturaProps) => {
                               descuento !== 0 ? "line-through" : "none",
                           }}
                         >
-                          {formatCurrency(total())}
+                          {descuento !== 0
+                            ? formatCurrency(total())
+                            : formatCurrency(factura.precio_total)}
                         </ListItemText>
                         {descuento !== 0 && (
                           <ListItemText>
-                            (descuento: {descuento}%) ={" "}
-                            {formatCurrency(factura.precio_total)}
+                            (descuento:{" "}
+                            {Math.ceil(
+                              (1 - factura.precio_total / total()) * 100
+                            )}
+                            %) = {formatCurrency(factura.precio_total)}
                           </ListItemText>
                         )}
                       </ListItem>
@@ -376,7 +426,6 @@ const Factura = (props: FacturaProps) => {
                           <ListItem
                             sx={{
                               ...ListItemStyle,
-                              textTransform: "capitalize",
                               display: "flex",
                               flexDirection: {
                                 xs: "row",
@@ -396,7 +445,12 @@ const Factura = (props: FacturaProps) => {
                               sx={{ flex: 1 }}
                               width="100%"
                             >
-                              <Typography component="span">
+                              <Typography
+                                component="span"
+                                sx={{
+                                  textTransform: "capitalize",
+                                }}
+                              >
                                 {s.servicio.cod_servicio}
                               </Typography>
                               <Typography component="span">
@@ -406,7 +460,7 @@ const Factura = (props: FacturaProps) => {
                             <ListItemText sx={{ textAlign: "right" }}>
                               {" "}
                               {moment(s.fecha_servicio).format(
-                                "DD-MM-YYYY, hh:mm"
+                                "DD-MM-YYYY, hh:mm a"
                               )}
                             </ListItemText>
                           </ListItem>
@@ -527,9 +581,6 @@ const Factura = (props: FacturaProps) => {
           </>
         )}
       </Stack>
-      {/* <Stack>
-        <pre>{JSON.stringify(factura, null, 2)}</pre>
-      </Stack> */}
     </>
   );
 };

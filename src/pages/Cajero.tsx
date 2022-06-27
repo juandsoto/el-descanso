@@ -1,4 +1,5 @@
 import { UserLayout, UserLayoutLeft, UserLayoutRight } from "../components";
+
 import Checkout from "../components/Checkout";
 
 const Cajero = (): JSX.Element => {

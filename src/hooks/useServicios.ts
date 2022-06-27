@@ -29,7 +29,10 @@ const useServicios = () => {
   const [
     { data: postResponse, loading: postLoading, error: postError },
     postServicioIncluido,
-  ] = useAxios<IServicioIncluido, ServicioIncluidoBody>(
+  ] = useAxios<
+    { detail: string; servicio_incluido: IServicioIncluido },
+    ServicioIncluidoBody
+  >(
     {
       url: "/servicioincluido/",
       method: "POST",
@@ -70,6 +73,7 @@ const useServicios = () => {
     fetchServiciosIncluidos,
     serviciosIncluidos,
     serviciosIncluidosLoading,
+    postResponse,
   };
 };
 

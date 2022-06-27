@@ -84,6 +84,7 @@ const Login = (): JSX.Element => {
   }, [response]);
 
   React.useEffect(() => {
+    // console.error({ error });
     error && toast.error(error?.response?.data.Error);
   }, [error]);
 
@@ -171,10 +172,10 @@ const Login = (): JSX.Element => {
                   ),
                 }}
               />
-              <FormControlLabel
+              {/* <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Recuerdame"
-              />
+              /> */}
               <Button
                 type="submit"
                 fullWidth

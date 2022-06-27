@@ -153,7 +153,7 @@ const TerminarReserva = () => {
               >
                 Total - {formatCurrency(precioTotal())}
               </Typography>
-              {habitual?.descuento !== 0 && (
+              {habitual && habitual.descuento !== 0 && (
                 <Typography
                   variant="subtitle1"
                   component={motion.span}

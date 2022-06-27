@@ -74,14 +74,14 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: { xs: "90%", sm: "60%" },
+    width: { xs: "90%", md: "60%" },
     minHeight: { xs: "80%", sm: "70%" },
     maxHeight: "95%",
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: "10px",
     overflowY: "scroll",
-    p: 4,
+    p: { xs: 2, sm: 4 },
     display: "flex",
     flexDirection: "column",
   };
@@ -141,8 +141,8 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                   ))}
                 </Box>
               </Box>
-              <Divider variant="fullWidth" />
-              <Typography id={`modal-${habitacion.descripcion}`} sx={{ mt: 2 }}>
+              <Divider variant="fullWidth" sx={{ my: 2 }} />
+              <Typography id={`modal-${habitacion.descripcion}`}>
                 {habitacion.descripcion}
               </Typography>
               <ImageSlider images={habitacion.images} />
@@ -163,7 +163,7 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
               </Box>
             </Box>
             <Stack
-              direction={{ xs: "column", sm: "row" }}
+              direction="row"
               justifyContent="space-between"
               alignItems="center"
             >
@@ -177,7 +177,7 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                   fontSize: "1rem",
                 }}
               />
-              {user.rol !== "administrador" ? (
+              {user.rol === "" && (
                 <Link
                   component={Button}
                   underline="none"
@@ -185,7 +185,6 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                   // @ts-ignore
                   onClick={handleClose}
                   sx={{
-                    display: { xs: "none", sm: "block" },
                     backgroundColor: "primary.main",
                     color: "text.primary",
                     "&:hover": {
@@ -195,7 +194,8 @@ const TipoHabitacionModal = (props: HabitacionModalProps): JSX.Element => {
                 >
                   Reservar
                 </Link>
-              ) : (
+              )}
+              {user.rol === "administrador" && (
                 <>
                   <Button onClick={() => setOpenDialog(true)}>
                     editar precio

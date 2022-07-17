@@ -15,12 +15,14 @@
 		"@mui/icons-material": "^5.6.1",
 		"@mui/material": "^5.6.1",
 		"@react-pdf/renderer": "^2.1.1",
+		"@types/lru-cache": "^7.10.10",
 		"axios": "^0.27.2",
 		"axios-hooks": "^3.1.0",
 		"faker": "^6.6.6",
 		"framer-motion": "^6.3.3",
 		"html2canvas": "^1.4.1",
 		"lodash": "^4.17.21",
+		"lru-cache": "^7.13.1",
 		"moment": "^2.29.3",
 		"react": "^18.0.0",
 		"react-chartjs-2": "^4.1.0",
@@ -30,8 +32,7 @@
 		"react-hot-toast": "^2.2.0",
 		"react-router-dom": "^6.3.0",
 		"react-spinners": "^0.12.0",
-		"use-react-screenshot": "^3.0.0",
-		"@types/lru-cache": "^7.10.10"
+		"use-react-screenshot": "^3.0.0"
 	},
 	"devDependencies": {
 		"@types/lodash": "^4.14.182",

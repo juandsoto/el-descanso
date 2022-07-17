@@ -70,12 +70,9 @@ const Navigator = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path="/el-descanso"> */}
-        <Route path="/">
-          {routes.map((props, index) => (
-            <Route key={index} {...props}></Route>
-          ))}
-        </Route>
+        {routes.map((props, index) => (
+          <Route key={index} {...props}></Route>
+        ))}
       </Routes>
     </BrowserRouter>
   );

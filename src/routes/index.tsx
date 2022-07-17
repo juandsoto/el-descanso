@@ -68,7 +68,7 @@ const routes: Route[] = [
 
 const Navigator = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/">
       <Routes>
         {routes.map((props, index) => (
           <Route key={index} {...props}></Route>
